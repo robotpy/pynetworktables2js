@@ -7,7 +7,7 @@
     http://localhost:8888/ to view the index.html page.
 '''
 
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, exists, join
 from optparse import OptionParser
 
 import tornado.web
@@ -57,10 +57,18 @@ if __name__ == '__main__':
     
     # setup tornado application with static handler + networktables support
     www_dir = abspath(join(dirname(__file__), 'www'))
+    index_html = join(www_dir, 'index.html')
+
+    if not exists(www_dir):
+        logger.error("Directory '%s' does not exist!" % www_dir)
+        exit(1)
+
+    if not exists(index_html):
+        logger.warn("%s not found" % index_html)
     
     app = tornado.web.Application(
         get_handlers() + [
-            (r"/()", NonCachingStaticFileHandler, {"path": join(www_dir, 'index.html')}),
+            (r"/()", NonCachingStaticFileHandler, {"path": index_html}),
             (r"/(.*)", NonCachingStaticFileHandler, {"path": www_dir})
         ]
     )
