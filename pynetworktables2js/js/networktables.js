@@ -137,7 +137,7 @@ var NetworkTables = new function () {
 	};
 	
 	// Returns true/false if key is in NetworkTable
-	this.containsKey = function() {
+	this.containsKey = function(key) {
 		return ntCache.has(key);
 	};
 	
