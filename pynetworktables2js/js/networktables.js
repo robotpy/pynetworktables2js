@@ -50,16 +50,29 @@ var NetworkTables = new function () {
 	// Utility functions
 	//
 	
-	// creates a new map object and returns it. The map is safe to store
-	// NetworkTables keys in
+	/**
+		Creates a new empty map (or hashtable) object and returns it. The map
+    	is safe to store NetworkTables keys in.
+    */
 	this.create_map = function() {
 		return new d3_map();
 	};
 	
-	// Escapes SD keys so that they're valid HTML identifiers
+	/**
+		Escapes NetworkTables keys so that they're valid HTML identifiers.
+
+		:param key: A networktables key
+    	:returns: Escaped value
+    */
 	this.keyToId = encodeURIComponent;
 	
-	// Escapes special characters and returns a valid jQuery selector
+	/**
+		Escapes special characters and returns a valid jQuery selector. Useful as
+    	NetworkTables does not really put any limits on what keys can be used.
+
+    	:param key: A networktables key
+    	:returns: Escaped value
+    */
 	this.keySelector = function(str) {
 	    return encodeURIComponent(str).replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1');
 	};
@@ -86,8 +99,14 @@ var NetworkTables = new function () {
 	// NetworkTables JS API
 	//
 	
-	// Sets functions to be called when the websocket connects/disconnects
-	// - f takes single parameter true/false for connected/disconnected
+	/**
+		Sets a function to be called when the websocket connects/disconnects
+
+	    :param f: a function that will be called with a single boolean parameter
+	              that indicates whether the websocket is connected
+	    :param immediateNotify: If true, the function will be immediately called
+	                            with the current status of the websocket
+    */
 	this.addWsConnectionListener = function(f, immediateNotify) {
 		connectionListeners.push(f);
 		
@@ -96,8 +115,16 @@ var NetworkTables = new function () {
 		}
 	};
 	
-	// Sets functions to be called when the robot connects/disconnects
-	// - This isn't meaningful if your server is a robot
+	/**
+		Sets a function to be called when the robot connects/disconnects to the
+	    pynetworktables2js server via NetworkTables. It will also be called when
+	    the websocket connects/disconnects.
+
+	    :param f: a function that will be called with a single boolean parameter
+	              that indicates whether the robot is connected
+	    :param immediateNotify: If true, the function will be immediately called
+	                            with the current robot connection state
+	*/
 	this.addRobotConnectionListener = function(f, immediateNotify) {
 		robotConnectionListeners.push(f);
 		
@@ -106,8 +133,14 @@ var NetworkTables = new function () {
 		}
 	}
 	
-	// Set a function that will be called whenever any value
-	// is changed in the table
+	/**
+		Set a function that will be called whenever any NetworkTables value is changed
+
+	    :param f: When any key changes, this function will be called with the following parameters; key: key name
+	              for entry, value: value of entry, isNew: If true, the entry has just been created
+	    :param immediateNotify: If true, the function will be immediately called
+	                            with the current value of all keys
+    */
 	this.addGlobalListener = function(f, immediateNotify) {
 		globalListeners.push(f);
 		
@@ -118,8 +151,15 @@ var NetworkTables = new function () {
 		}
 	};
 	
-	// Set a function that will be called whenever a value for a particular
-	// key is changed in the table
+	/**
+	    Set a function that will be called whenever a value for a particular key is changed in NetworkTables
+
+	    :param key: A networktables key to listen for
+	    :param f: When the key changes, this function will be called with the following parameters; key: key name
+	              for entry, value: value of entry, isNew: If true, the entry has just been created
+	    :param immediateNotify: If true, the function will be immediately called
+	                            with the current value of the specified key
+	*/
 	this.addKeyListener = function(key, f, immediateNotify) {
 		var listeners = keyListeners.get(key);
 		if (listeners !== undefined) {
@@ -136,28 +176,72 @@ var NetworkTables = new function () {
 		}
 	};
 	
-	// Returns true/false if key is in NetworkTable
+	// Returns true/false if key is in NetworkTables
 	this.containsKey = function() {
 		return ntCache.has(key);
 	};
 	
-	// Returns a NetworkTable value (cached)
-	this.getValue = function(key) {
-		return ntCache.get(key);
+	/**
+		Returns the value that the key maps to. If the websocket is not
+	    open, this will always return the default value specified.
+
+	    :param key: A networktables key
+	    :param defaultValue: If the key isn't present in the table, return this instead
+	    :returns: value of key if present, ``undefined`` or ``defaultValue`` otherwise
+
+	    .. note:: To make a fully dynamic webpage that updates when the robot
+	              updates values, it is recommended (and simpler) to use
+	              :func:`addKeyListener` or :func:`addGlobalListener` to listen
+	              for changes to values, instead of using this function.
+    */
+	this.getValue = function(key, defaultValue) {
+		var val = ntCache.get(key);
+		if (val === undefined)
+			return defaultValue;
+		else
+			return val;
 	};
 	
-	// returns True if websocket is connected
-	this.isConnected = function() {
+	// returns true if robot is connected
+	this.isRobotConnected = function() {
+		return robotConnected;
+	};
+
+	// returns true if websocket is connected
+	this.isWsConnected = function() {
 		return socketOpen;
 	};
 	
-	// Sets a NetworkTable value
-	// - Nothing happens if NetworkTables isn't connected
-	this.setValue = function(key, value) {
-		if (socketOpen) {
-			socket.send(JSON.stringify({'k': key, 'v': value}));
-		}
+	/**
+		Sets the value in NetworkTables. If the websocket is not connected, the
+	    value will be discarded.
+
+	    :param key: A networktables key
+	    :param value: The value to set (see warnings)
+	    :returns: True if the websocket is open, False otherwise
+
+	    .. note:: When you put a value, it will not be immediately available
+	              from ``getValue``. The value must be sent to the NetworkTables
+	              server first, which will then send the change notification
+	              back up to the javascript NetworkTables key/value cache.
+
+	    .. warning:: NetworkTables is type sensitive, whereas Javascript is loosely
+	                 typed. This function will **not** check the type of the value
+	                 that you are trying to put, so you must be careful to only put
+	                 the correct values that are expected. If your robot tries to
+	                 retrieve the value and it is an unexpected type, an exception
+	                 will be thrown and your robot may crash. You have been warned.
+    */
+	this.putValue = function(key, value) {
+		if (!socketOpen)
+			return false;
+
+		socket.send(JSON.stringify({'k': key, 'v': value}));
+		return true;
 	};
+
+	// backwards compatibility; depreciated
+	this.setValue = this.putValue;
 	
 	//
 	// NetworkTables socket code

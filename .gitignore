@@ -5,6 +5,8 @@ MANIFEST
 __pycache__
 *.egg-info
 
+docs/_build
+
 version.py
 
 .project

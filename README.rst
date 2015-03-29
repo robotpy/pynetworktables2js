@@ -1,13 +1,19 @@
 pynetworktables2js
 ==================
 
-A library that forwards NetworkTables key/values over a Websocket, so that
-you can easily write your dashboard in HTML5 + JavaScript.
+A cross platform library that forwards NetworkTables key/values over a Websocket,
+so that you can easily write a Driver Station Dashboard for your robot in HTML5 +
+JavaScript.
 
 This library does not provide a full dashboard solution, but is intended to
 provide the necessary plumbing for one to create one with only knowledge
-of HTML/Javascript. Because the communication layer uses NetworkTables, you
+of HTML/Javascript. Because the communications layer uses NetworkTables, you
 can connect to all FRC languages (C++, Java, LabVIEW, Python).
+
+.. note:: NetworkTables is a protocol used for robot communication in the
+          FIRST Robotics Competition, and can be used to talk to
+          SmartDashboard/SFX. It does not have any security, and should never
+          be used on untrusted networks.
 
 Installation
 ============
@@ -21,6 +27,26 @@ On Linux/OSX you can execute::
 
     pip install pynetworktables2js
 
+.. note:: Technically, there's nothing stopping you from installing this on
+          your robot, as there is a python interpreter available on the 
+          roboRIO (RobotPy). However, due to FRC bandwidth limitations,
+          it's probably best to run the UI + server on your driver station
+          laptop.
+
+Why make an HTML/Javascript dashboard?
+======================================
+
+**TL;DR**: It's simpler.
+
+pynetworktables2js lowers the barrier of entry for teams that want an
+additional way to tune/control their robot with a minimal amount of
+programming.
+
+Lots of students and mentors know how to create simple web pages to display
+content, and there's lots of resources out there for creating dynamic content
+for webpages that use javascript. There is a lot of visually appealing
+content that others have created using web technologies -- why not leverage
+those resources to make something cool to control your robot?
 
 Usage
 =====
@@ -29,20 +55,43 @@ Go to the 'example' directory distributed with pynetworktables2js, and run::
 
 	python server.py --robot 127.0.0.1
 
+If you want to try this out with your current robot, you can do::
+
+    python server.py --robot roborio-XXX.local
+
 If you navigate your browser (I recommend Chrome) to http://127.0.0.1:8888, all
 of the current NetworkTables values will be shown as they change.
 
-One way of testing this out is use the TableViewer application, and start it in
-server mode.
+One way of testing this out is use FIRST's TableViewer application (you can
+launch it using the "Outline Viewer" WPILib menu item in Eclipse), and start
+it in server mode.
 
 Feel free to copy the example directory to create your own customized
 dashboard. Just add your custom files to the www directory.
+
+Contributing new changes
+========================
+
+pynetworktables2js is intended to be a project that all members of the FIRST
+community can quickly and easily contribute to. If you find a bug, or have an
+idea that you think others can use:
+
+1. `Fork this git repository <https://github.com/robotpy/pynetworktables2js/fork>`_ to your github account
+2. Create your feature branch (``git checkout -b my-new-feature``)
+3. Commit your changes (``git commit -am 'Add some feature'``)
+4. Push to the branch (``git push -u origin my-new-feature``)
+5. Create new Pull Request on github
+
+One place in particular I would love to see contributions is in adding useful
+javascript functions/objects that make creating dashboards even easier!
 
 Authors
 =======
 
 Leon Tan of FRC Team 1418 did the initial research/work to get this working,
-and created an initial working prototype for Team 1418's 2015 Dashboard.
+and created an initial working prototype for Team 1418's 2015 Dashboard, which
+was instrumental to winning an Innovation In Control award at the 2015 Greater
+DC Regional.
 
 Dustin Spicuzza cleaned stuff up, rewrote things, added more functionality,
-and packaged it so other teams could use it.
+wrote documentation, and packaged it so other teams could use it.
