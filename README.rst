@@ -15,6 +15,11 @@ can connect to all FRC languages (C++, Java, LabVIEW, Python).
           SmartDashboard/SFX. It does not have any security, and should never
           be used on untrusted networks.
 
+Documentation
+=============
+
+Documentation can be found at http://pynetworktables2js.readthedocs.org/
+
 Installation
 ============
 
