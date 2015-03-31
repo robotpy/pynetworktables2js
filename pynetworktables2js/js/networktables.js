@@ -37,6 +37,12 @@ var NetworkTables = new function () {
 			return this._[d3_map_escape(key)];
 		};
 		
+		this.getKeys = function() {
+			var keys = [];
+			for(var key in this._) keys.push(d3_map_unescape(key));
+			return keys;
+		};
+		
 		this.has = function(key) {
 			return d3_map_escape(key) in this._;
 		};
@@ -179,6 +185,11 @@ var NetworkTables = new function () {
 	// Returns true/false if key is in NetworkTables
 	this.containsKey = function(key) {
 		return ntCache.has(key);
+	};
+	
+	// Returns all the keys in the NetworkTables
+	this.getKeys = function() {
+		return ntCache.getKeys();
 	};
 	
 	/**
