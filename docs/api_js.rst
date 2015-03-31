@@ -93,6 +93,10 @@ NetworkTables Interface
 
     :param key: A networktables key
     :returns: true if a key is present in NetworkTables, false otherwise
+    
+.. js:function:: NetworkTables.getKeys()
+
+    :returns: all the keys in the NetworkTables
 
 .. js:function:: NetworkTables.getValue(key[, defaultValue])
 
