@@ -12,11 +12,19 @@
 <!-- Obviously, you will want to copy this file locally in a real 
      dashboard, as the Driver Station won't have internet access -->
 <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 
 <!-- uncomment this is you want to use included utility functions that
      implement common functionality that you might find useful. Requires
      that d3.js and jQuery are included first -->
 <!-- <script src="/networktables/utils.js"></script> -->
+
+<!-- This is required to add widgets to the dashboard. Requires that
+	 jQuery and jQuery-ui are included first -->
+<script src="/networktables/dashboard-widget.js"></script>
+
+<!-- Adds the value display widget -->
+<script src="/widgets/value-display/value-display.js"></script>
 
 <div>
 	NetworkTables websocket: <span id="connectstate">Unknown state</span><br/>
@@ -24,10 +32,7 @@
 </div>
 <hr/>
 
-<table id="nt" border=1>
-	<tbody></tbody>
-</table>
-
+<div id="value-display-widgets"></div>
 
 <script type="text/javascript">
 "use strict";
@@ -42,6 +47,7 @@ $(document).ready(function(){
 	
 	// sets a function that will be called when any NetworkTables key/value changes
 	NetworkTables.addGlobalListener(onValueChanged, true);
+
 });
 
 
@@ -54,35 +60,28 @@ function onNetworkTablesConnection(connected) {
 	if (connected) {
 		$("#connectstate").text("Connected!");
 		
-		// clear the table
-		$("#nt tbody > tr").remove();
-		
 	} else {
 		$("#connectstate").text("Disconnected!");
 	}
 }
 
+var $value_display_widgets = $('#value-display-widgets');
+
 function onValueChanged(key, value, isNew) {
-
-	// key thing here: we're using the various NetworkTable keys as
-	// the id of the elements that we're appending, for simplicity. However,
-	// the key names aren't always valid HTML identifiers, so we use
-	// the NetworkTables.keyToId() function to convert them appropriately
-
-	if (isNew) {
-		var tr = $('<tr></tr>').appendTo($('#nt > tbody:last'));
-		$('<td></td>').text(key).appendTo(tr);
-		$('<td></td>').attr('id', NetworkTables.keyToId(key))
-					   .text(value)
-					   .appendTo(tr);
-	} else {
 	
-		// similarly, use keySelector to convert the key to a valid jQuery
-		// selector. This should work for class names also, not just for ids
-		$('#' + NetworkTables.keySelector(key)).text(value);
-	}
-}
+	if (!isNew)
+		return;	
 
+	$('<div></div>')
+		.appendTo($value_display_widgets)
+		.dashboardWidget({
+			type : 'valueDisplay',
+			networkTables : {
+				key : key
+			}
+		});
+		
+}
 </script>
 
 </body>
