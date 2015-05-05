@@ -1,18 +1,10 @@
-
 from os.path import abspath, dirname, join
-
-try:
-    from ujson import loads
-except ImportError:
-    from json import loads
-
 
 from tornado.ioloop import IOLoop
 from tornado.web import StaticFileHandler
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
-
-from networktables import NetworkTable
+from .nt_serial import NTSerial
 
 import logging
 logger = logging.getLogger('net2js')
@@ -24,48 +16,31 @@ class NetworkTablesWebSocket(WebSocketHandler):
         A tornado web handler that forwards values between NetworkTables
         and a webpage via a websocket
     '''
+
+    ntserial = None
     
     def open(self):
         logger.info("NetworkTables websocket opened")
-
         self.ioloop = IOLoop.current()
-        self.nt = NetworkTable.getGlobalTable()
-        NetworkTable.addGlobalListener(self.on_nt_change, immediateNotify=True)
-        self.nt.addConnectionListener(self, immediateNotify=True)
+        self.ntserial = NTSerial(self.send_msg_threadsafe)
 
     def on_message(self, message):
-        # called when message is received from the dashboard
-        data = loads(message)
-        self.nt.putValue(data['k'], data['v'])
-   
-    def on_close(self):
-        logger.info("NetworkTables websocket closed")
-        NetworkTable.removeGlobalListener(self.on_nt_change)
-    
-    def send_to_dashboard(self, msg):
+        if self.ntserial is not None:
+            self.ntserial.process_update(message)
+
+    def send_msg(self, msg):
         try:
             self.write_message(msg, False)
         except WebSocketClosedError:
             logger.warn("websocket closed when sending message")
 
-    #
-    # NetworkTables API
-    #
-    # These functions cannot directly access the websocket, as they are
-    # called from another thread
-    
-    def on_nt_change(self, key, value, isNew):
-        self.ioloop.add_callback(self.send_to_dashboard,
-                                 {'k': key, 'v': value, 'n': isNew})
-        
-    def connected(self, table):
-        self.ioloop.add_callback(self.send_to_dashboard,
-                                 {'r': True})
-    
-    def disconnected(self, table):
-        self.ioloop.add_callback(self.send_to_dashboard,
-                                 {'r': False})
+    def send_msg_threadsafe(self, data):
+        self.ioloop.add_callback(self.send_msg, data)
 
+    def on_close(self):
+        logger.info("NetworkTables websocket closed")
+        if self.ntserial is not None:
+            self.ntserial.close()
 
 class NonCachingStaticFileHandler(StaticFileHandler):
     '''
