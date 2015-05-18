@@ -52,9 +52,10 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'tornado>=4.0',
         'pynetworktables>=2015.2.1'
     ],
+    extras_require={'aiohttp': ['aiohttp>=0.15'],
+                    'tornado': ['tornado>=4.0']},
     license="BSD License",
     classifiers=[
         "Development Status :: 4 - Beta",
