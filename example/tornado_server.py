@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 '''
-    This is an example server application that you can use to connect your
-    HTML/Javascript dashboard code to your robot via NetworkTables.
+    This is an example server application, using the tornado handlers,
+    that you can use to connect your HTML/Javascript dashboard code to
+    your robot via NetworkTables.
 
     Run this application with python, then you can open your browser to 
     http://localhost:8888/ to view the index.html page.
