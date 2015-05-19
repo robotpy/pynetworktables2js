@@ -83,3 +83,24 @@ var dashboardWidget = new function() {
 	};
 	
 };
+
+// An element with a data-type attribute equal to a widget name without the nt prefix and a 
+// data-nt attribute with a NetworkTables key will automatically have the widget called on it
+// when the page loads.
+$(function() {
+	$('[data-type]').each(function() {
+		
+		var element = $(this);
+		var type = element.attr('data-type');
+		
+		if(('nt' + type in jQuery.fn) == false) {
+			return;
+		}
+		
+		var ntKey = element.attr('data-nt');
+		
+		element['nt' + type]({
+			ntKey: ntKey
+		});
+	});
+});

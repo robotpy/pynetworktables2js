@@ -26,11 +26,19 @@
 <!-- Adds the value display widget -->
 <script src="/widgets/value-display/value-display.js"></script>
 
+
+
 <div>
 	NetworkTables websocket: <span id="connectstate">Unknown state</span><br/>
 	Robot: <span id="robotstate">Unknown state</span>
 </div>
 <hr/>
+
+<!-- You can also create a widget like this:
+
+<div data-nt="/SmartDashboard/DriveTrain/hasCommand" data-type="ValueDisplay"></div>
+
+ -->
 
 <div id="value-display-widgets"></div>
 
