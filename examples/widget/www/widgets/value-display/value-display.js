@@ -1,14 +1,17 @@
-$.pynetworktables2js.dashboardWidget.types['valueDisplay'] = {
-		
-	init : function(widget) {
-		widget.keyElement = widget.element.find('.key')
-			.text(widget.options.networkTables.key);
-		widget.valueElement = widget.element.find('.value');
+"use strict";
+
+dashboardWidget.addType({
+	
+	name: 'ValueDisplay',
+	view: '/widgets/value-display/value-display.html',
+	
+	initWidget: function() {
+		this.keyElement = this.element.find('.key').text(this.options.ntKey);
+		this.valueElement = this.element.find('.value');
 	},
 	
-	updateWidget : function(value, isNew, widget) {
-		widget.valueElement.text(value);
-	},
+	updateWidget: function(value, isNew) {
+		this.valueElement.text(value);
+	}
 	
-	url : '/widgets/value-display/value-display.html'
-};
+});

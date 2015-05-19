@@ -74,13 +74,7 @@ function onValueChanged(key, value, isNew) {
 
 	$('<div></div>')
 		.appendTo($value_display_widgets)
-		.dashboardWidget({
-			type : 'valueDisplay',
-			networkTables : {
-				key : key
-			}
-		});
-		
+		.ntValueDisplay({ ntKey: key });		
 }
 </script>
 
