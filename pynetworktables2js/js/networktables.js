@@ -168,7 +168,7 @@ var NetworkTables = new function () {
 	*/
 	this.addKeyListener = function(key, f, immediateNotify) {
 		var listeners = keyListeners.get(key);
-		if (listeners !== undefined) {
+		if (listeners === undefined) {
 			keyListeners.set(key, [f]);
 		} else {
 			listeners.push(f);
