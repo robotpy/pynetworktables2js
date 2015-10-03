@@ -56,13 +56,17 @@ those resources to make something cool to control your robot?
 Usage
 =====
 
+There are two example servers distributed with pynetworktables2js, one that
+uses `tornado <http://www.tornadoweb.org/en/stable/>`_, and one that uses
+`aiohttp <https://github.com/KeepSafe/aiohttp>`_. Either one should work.
+
 Go to the 'example' directory distributed with pynetworktables2js, and run::
 
-	python server.py --robot 127.0.0.1
+    python tornado_server.py --robot 127.0.0.1
 
 If you want to try this out with your current robot, you can do::
 
-    python server.py --robot roborio-XXX.local
+    python tornado_server.py --robot roborio-XXX.local
 
 If you navigate your browser (I recommend Chrome) to http://127.0.0.1:8888, all
 of the current NetworkTables values will be shown as they change.
