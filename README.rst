@@ -60,6 +60,26 @@ There are two example servers distributed with pynetworktables2js, one that
 uses `tornado <http://www.tornadoweb.org/en/stable/>`_, and one that uses
 `aiohttp <https://github.com/KeepSafe/aiohttp>`_. Either one should work.
 
+No-copy server
+--------------
+
+You can just distribute your HTML files, and run a pynetworktables server
+using the following command from inside the directory::
+
+    python -m pynetworktables2js
+	
+Or on Windows::
+
+    py -m pynetworktables2js
+    
+This will start a pynetworktables2js server using Tornado (which is installed
+by default) and it will serve the current directory. You can navigate your
+browser (I recommend Chrome) to http://127.0.0.1:8888 and see your website.
+
+
+Customized python server
+------------------------
+
 Go to the 'example' directory distributed with pynetworktables2js, and run::
 
     python tornado_server.py --robot 127.0.0.1
