@@ -36,7 +36,7 @@ def init_networktables(ipaddr):
     logger.info("Networktables Initialized")
 
 
-if __name__ == '__main__':
+def main():
 
     # Setup options here
     parser = OptionParser()
@@ -83,3 +83,6 @@ if __name__ == '__main__':
 
     app.listen(options.port)
     IOLoop.current().start()
+
+if __name__ == '__main__':
+    main()

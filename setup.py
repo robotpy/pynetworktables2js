@@ -55,6 +55,7 @@ setup(
         'tornado>=4.0',
         'pynetworktables>=2015.2.1'
     ],
+    entry_points={'console_scripts': [ 'pynetworktables2js = pynetworktables2js.__main__:main' ]},
     license="BSD License",
     classifiers=[
         "Development Status :: 4 - Beta",
