@@ -182,12 +182,22 @@ var NetworkTables = new function () {
 		}
 	};
 	
-	// Returns true/false if key is in NetworkTables
+	/**
+		Returns true/false if key is in NetworkTables
+
+		.. warning:: This may not return correct results when the websocket is not
+                 	 connected
+    */
 	this.containsKey = function(key) {
 		return ntCache.has(key);
 	};
 	
-	// Returns all the keys in the NetworkTables
+	/**
+		Returns all the keys in the NetworkTables
+		
+		.. warning:: This may not return correct results when the websocket is not
+                 	 connected
+    */
 	this.getKeys = function() {
 		return ntCache.getKeys();
 	};
@@ -199,6 +209,9 @@ var NetworkTables = new function () {
 	    :param key: A networktables key
 	    :param defaultValue: If the key isn't present in the table, return this instead
 	    :returns: value of key if present, ``undefined`` or ``defaultValue`` otherwise
+
+	    .. warning:: This may not return correct results when the websocket is not
+                 	 connected
 
 	    .. note:: To make a fully dynamic webpage that updates when the robot
 	              updates values, it is recommended (and simpler) to use

@@ -93,10 +93,16 @@ NetworkTables Interface
 
     :param key: A networktables key
     :returns: true if a key is present in NetworkTables, false otherwise
+
+    .. warning:: This may not return correct results when the websocket is not
+                 connected
     
 .. js:function:: NetworkTables.getKeys()
 
     :returns: all the keys in the NetworkTables
+
+    .. warning:: This may not return correct results when the websocket is not
+                 connected
 
 .. js:function:: NetworkTables.getValue(key[, defaultValue])
 
@@ -106,6 +112,9 @@ NetworkTables Interface
     :param key: A networktables key
     :param defaultValue: If the key isn't present in the table, return this instead
     :returns: value of key if present, ``undefined`` or ``defaultValue`` otherwise
+
+    .. warning:: This may not return correct results when the websocket is not
+                 connected
 
     .. note:: To make a fully dynamic webpage that updates when the robot
               updates values, it is recommended (and simpler) to use
