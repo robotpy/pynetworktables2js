@@ -40,7 +40,7 @@ if ($ === undefined) {
 function attachSelectToSendableChooser(html_id, nt_key) {
 
     if (!nt_key.startsWith('/')) {
-        nt_key = '/SmartDashboard' + nt_key;
+        nt_key = '/SmartDashboard/' + nt_key;
     }
 
     function update(key, value, isNew) {
@@ -50,6 +50,10 @@ function attachSelectToSendableChooser(html_id, nt_key) {
     NetworkTables.addKeyListener(nt_key + '/options', update, true);
     NetworkTables.addKeyListener(nt_key + '/default', update, true);
     NetworkTables.addKeyListener(nt_key + '/selected', update, true);
+    
+    $(html_id).change(function() {
+      NetworkTables.putValue(nt_key + "/selected", $(html_id).val());
+    });
 }
 
 
