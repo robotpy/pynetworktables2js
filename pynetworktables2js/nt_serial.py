@@ -46,10 +46,10 @@ class NTSerial(object):
 
     # NetworkTables connection listener callbacks
     def _nt_connected(self, table):
-        self._send_update({'r': True})
+        self._send_update({'r': True, 'a': self.nt.getRemoteAddress()})
 
     def _nt_disconnected(self, table):
-        self._send_update({'r': False})
+        self._send_update({'r': False, 'a': None})
 
     def close(self):
         """

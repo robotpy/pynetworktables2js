@@ -35,6 +35,9 @@ These functions allow your code to listen for particular NetworkTables events.
     Sets a function to be called when the robot connects/disconnects to the
     pynetworktables2js server via NetworkTables. It will also be called when
     the websocket connects/disconnects.
+    
+    When a listener function is called with a 'true' parameter, the 
+    NetworkTables.getRobotAddress() function will return a non-null value.
 
     :param f: a function that will be called with a single boolean parameter
               that indicates whether the robot is connected
@@ -120,6 +123,10 @@ NetworkTables Interface
               updates values, it is recommended (and simpler) to use
               :func:`addKeyListener` or :func:`addGlobalListener` to listen
               for changes to values, instead of using this function.
+              
+.. js:function:: NetworkTables.getRobotAddress()
+
+    :returns: null if the robot is not connected, or a string otherwise
 
 .. js:function:: NetworkTables.isRobotConnected()
 

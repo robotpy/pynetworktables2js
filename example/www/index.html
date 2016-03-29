@@ -20,7 +20,7 @@
 
 <div>
 	NetworkTables websocket: <span id="connectstate">Unknown state</span><br/>
-	Robot: <span id="robotstate">Unknown state</span>
+	Robot: <span id="robotstate">Unknown state</span> @ <span id="robotAddress">disconnected</span>
 </div>
 <hr/>
 
@@ -47,6 +47,7 @@ $(document).ready(function(){
 
 function onRobotConnection(connected) {
 	$('#robotstate').text(connected ? "Connected!" : "Disconnected");
+	$('#robotAddress').text(connected ? NetworkTables.getRobotAddress() : "disconnected");
 }
 
 function onNetworkTablesConnection(connected) {

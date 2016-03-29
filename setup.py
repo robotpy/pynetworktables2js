@@ -53,12 +53,12 @@ setup(
     zip_safe=False,
     install_requires=[
         'tornado>=4.0',
-        'pynetworktables>=2015.2.1'
+        'pynetworktables>=2015.3.1'
     ],
     entry_points={'console_scripts': [ 'pynetworktables2js = pynetworktables2js.__main__:main' ]},
     license="BSD License",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "License :: OSI Approved :: BSD License",

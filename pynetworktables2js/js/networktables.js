@@ -226,6 +226,11 @@ var NetworkTables = new function () {
 			return val;
 	};
 	
+	// returns null if robot is not connected, string otherwise
+	this.getRobotAddress = function() {
+		return robotAddress;
+	};
+	
 	// returns true if robot is connected
 	this.isRobotConnected = function() {
 		return robotConnected;
@@ -274,6 +279,7 @@ var NetworkTables = new function () {
 	var socket;
 	var socketOpen = false;
 	var robotConnected = false;
+	var robotAddress = null;
 	
 	// construct the websocket URI
 	var loc = window.location;
@@ -309,6 +315,7 @@ var NetworkTables = new function () {
 				// robot connection event
 				if (data.r !== undefined) {
 					robotConnected = data.r;
+					robotAddress = data.a;
 					for (var i in robotConnectionListeners) {
 						robotConnectionListeners[i](robotConnected);
 					}
@@ -354,6 +361,7 @@ var NetworkTables = new function () {
 					
 					socketOpen = false;
 					robotConnected = false;
+					robotAddress = null;
 					console.log("Socket closed");
 				}
 				
