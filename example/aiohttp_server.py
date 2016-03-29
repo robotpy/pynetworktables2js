@@ -70,7 +70,7 @@ if __name__ == '__main__':
     app.router.add_route("GET", "/", forward_request)
     static_dir = abspath(join(dirname(__file__), 'www'))
     if not exists(static_dir):
-        logger.error("Directory '%s' does not exist!" % static_dir)
+        logger.error("Directory '%s' does not exist!", static_dir)
         exit(1)
     app.router.add_static("/", static_dir)
 

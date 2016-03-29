@@ -65,11 +65,11 @@ def main():
     index_html = join(www_dir, 'index.html')
 
     if not exists(www_dir):
-        logger.error("Directory '%s' does not exist!" % www_dir)
+        logger.error("Directory '%s' does not exist!", www_dir)
         exit(1)
 
     if not exists(index_html):
-        logger.warn("%s not found" % index_html)
+        logger.warn("%s not found", index_html)
     
     app = tornado.web.Application(
         get_handlers() + [
@@ -79,7 +79,7 @@ def main():
     )
     
     # Start the app
-    logger.info("Listening on http://localhost:%s/" % options.port)
+    logger.info("Listening on http://localhost:%s/", options.port)
 
     app.listen(options.port)
     IOLoop.current().start()

@@ -61,7 +61,7 @@ if __name__ == '__main__':
     index_html = join(www_dir, 'index.html')
 
     if not exists(www_dir):
-        logger.error("Directory '%s' does not exist!" % www_dir)
+        logger.error("Directory '%s' does not exist!", www_dir)
         exit(1)
 
     if not exists(index_html):
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     )
     
     # Start the app
-    logger.info("Listening on http://localhost:%s/" % options.port)
+    logger.info("Listening on http://localhost:%s/", options.port)
 
     app.listen(options.port)
     IOLoop.current().start()
