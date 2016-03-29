@@ -87,6 +87,12 @@ Go to the 'example' directory distributed with pynetworktables2js, and run::
 If you want to try this out with your current robot, you can do::
 
     python tornado_server.py --robot roborio-XXX.local
+    
+If you are running pynetworktables2js on your driver station laptop, you can
+receive robot IP information directly from the Driver Station (handy during
+actual competitions):
+
+	python tornado_server.py --dashboard
 
 If you navigate your browser (I recommend Chrome) to http://127.0.0.1:8888, all
 of the current NetworkTables values will be shown as they change.

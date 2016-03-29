@@ -23,11 +23,16 @@ logger = logging.getLogger('dashboard')
 log_datefmt = "%H:%M:%S"
 log_format = "%(asctime)s:%(msecs)03d %(levelname)-8s: %(name)-20s: %(message)s"
 
-def init_networktables(ipaddr):
+def init_networktables(options):
 
-    logger.info("Connecting to networktables at %s" % ipaddr)
-    NetworkTable.setIPAddress(ipaddr)
-    NetworkTable.setClientMode()
+    if options.dashboard:
+        logger.info("Connecting to networktables in Dashboard mode")
+        NetworkTable.setDashboardMode()
+    else:
+        logger.info("Connecting to networktables at %s", options.robot)
+        NetworkTable.setIPAddress(options.robot)
+        NetworkTable.setClientMode()
+    
     NetworkTable.initialize()
     logger.info("Networktables Initialized")
 
@@ -46,6 +51,9 @@ if __name__ == '__main__':
     parser.add_option('--robot', default='127.0.0.1', 
                       help="Robot's IP address")
     
+    parser.add_option('--dashboard', default=False, action='store_true',
+                      help='Use this instead of --robot to receive the IP from the driver station. WARNING: It will not work if you are not on the same host as the DS!')
+    
     options, args = parser.parse_args()
     
     # Setup logging
@@ -53,8 +61,11 @@ if __name__ == '__main__':
                         format=log_format,
                         level=logging.DEBUG if options.verbose else logging.INFO)
     
+    if options.dashboard and options.robot != '127.0.0.1':
+        parser.error("Cannot specify --robot and --dashboard")
+    
     # Setup NetworkTables
-    init_networktables(options.robot)
+    init_networktables(options)
     
     # setup tornado application with static handler + networktables support
     www_dir = abspath(join(dirname(__file__), 'www'))
