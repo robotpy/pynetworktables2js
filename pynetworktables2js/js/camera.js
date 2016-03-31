@@ -21,6 +21,9 @@ function loadCameraOnConnect(args) {
         attrs.width = 640;
         attrs.height = 480;
     }
+
+    if (!args.timeout)
+        args.timeout = 1000;
     
     var cx = Math.round(attrs.width/2.0);
     var cy = Math.round(attrs.height/2.0);
@@ -29,6 +32,7 @@ function loadCameraOnConnect(args) {
     
     var xhr = null;
     var tid = null;
+    var errors = 0;
     
     function create_remote_uri(path) {
         var camera_url = args.host;
@@ -67,11 +71,11 @@ function loadCameraOnConnect(args) {
     }
     
     function onWaiting() {
+        errors = 0;
         if (args.wait_img) {
             set_img({src: args.wait_img});
         } else {
             var e = set_svg();
-            //e.append($s('circle').attr({cx: cx, cy: cy, r: 50, fill: 'orange'}));
             e.append($s('line').attr({stroke: 'red', 'stroke-width': 10,
                                       x1: cx1, x2: cx2, y1: cy1, y2: cy2}));
             e.append($s('line').attr({stroke: 'red', 'stroke-width': 10,
@@ -80,15 +84,27 @@ function loadCameraOnConnect(args) {
     }
     
     function onSuccess() {
-        set_img({src: create_remote_uri(args.image_url)});
+        var webcam_url = create_remote_uri(args.image_url);
+        errors = 0;
+        clearTimeout(tid);
+        tid = null;
+        xhr = null;
+
+        console.log("loadCameraOnConnect: successfully connected to server, loading webcam at " + webcam_url);
+        set_img({src: webcam_url});
     }
     
     function onError() {
+        errors += 1;
         container.empty();
-        if (args.error_img) {
+        if (errors < 3) {
+            // set black background for 3 seconds
+            set_svg();
+        } else if (args.error_img) {
             set_img({src: args.error_img});
         } else {
             var e = set_svg();
+
             e.append($s('polyline').attr({fill: 'orange', stroke: 'red',
                 'stroke-width': 4,
                 points: '' + cx + ',' + cy1 + ' ' + 
@@ -106,37 +122,51 @@ function loadCameraOnConnect(args) {
             
         if (!NetworkTables.isRobotConnected())
             return;
+
+        var detect_uri = create_remote_uri(args.data_url);
         
-        console.log("Trying " + create_remote_uri(args.data_url));
+        if (errors == 0)
+            console.log("loadCameraOnConnect: Detecting webcam server via connection to " + detect_uri);
         
-        xhr = $.jsonp({
-            url: create_remote_uri(args.data_url),
-            error: function() {
-                console.log("error");
-                xhr = null;
-                
-                if (NetworkTables.isRobotConnected()) {
-                    onError();
+        // hack: need to determine whether the other side is listening, so we
+        // we make an HTTP request that can be aborted. However, if this is to
+        // work on webcams that we can't control the source code for (such as
+        // an Axis camera), we can't mandate that the other side set an
+        // appropriate CORS header, so we can't use a normal AJAX call or we run
+        // into cross-domain problems.
+        // 
+        // all we care about is that the remote server was successfully talked
+        // to, so we use JSONP which will work cross domain, and if the error 
+        // returned is 'parsererror' then we know that *something* was loaded
+        // from the other side, so that's good enough.
+        //
+        // Only tested on Chrome
+
+        xhr = $.ajax({
+            url: detect_uri,
+            dataType: 'jsonp',
+            complete: function(o, e) {
+                if (o.status == 200) {
+                    // if the resource was successfully retrieved, that's all we care about
+                    onSuccess();
+                } else {
+                    xhr = null;
+                    if (NetworkTables.isRobotConnected()) {
+                        onError();
+                    }
                 }
-            },
-            success: function() {
-                console.log("ok");
-                clearTimeout(tid);
-                tid = null;
-                xhr = null;
-                onSuccess();
             }
         });
         
-        setTimeout(tryConnect, 1000);
+        tid = setTimeout(tryConnect, args.timeout);
     }
     
     function onRobotConnection(connected) {
-        onWaiting();
-        
         if (connected) {
             tryConnect();
         } else {
+            onWaiting();
+
             // cancel any outstanding timeouts
             if (tid != null) {
                 clearTimeout(tid);
@@ -150,5 +180,6 @@ function loadCameraOnConnect(args) {
         }
     }
     
+    onWaiting();
     NetworkTables.addRobotConnectionListener(onRobotConnection, true);
 }

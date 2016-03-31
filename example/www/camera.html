@@ -11,7 +11,7 @@
 
 <!-- Obviously, you will want to copy this file locally in a real 
      dashboard, as the Driver Station won't have internet access -->
-<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
 
 <!-- utility functions to attach to a camera -->
 <script src="/networktables/camera.js"></script>
@@ -43,7 +43,7 @@ $(document).ready(function(){
         container: '#camera_container', // where to put the img tag
         proto: null,                    // optional, defaults to http://
         host: null,                     // optional, if null will use robot's autodetected IP address
-        port: 8080,                     // webserver port
+        port: 5800,                     // webserver port
         image_url: '/?action=stream',   // mjpg stream of camera
         data_url: '/program.json',      // used to test if connection is up
         wait_img: null,                 // optional img to show when not connected, can use SVG instead
