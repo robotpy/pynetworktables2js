@@ -60,7 +60,7 @@ function attachSelectToSendableChooser(html_id, nt_key) {
 /**
     This function is designed to be used from the onValueChanged callback
     whenever values from a SendableChooser change, but you probably should
-    prefer to use attachSendableChooserToCombo instead.
+    prefer to use attachSelectToSendableChooser instead.
 
     See attachSelectToSendableChooser documentation.
 */
@@ -68,7 +68,7 @@ function updateSelectWithChooser(html_id, nt_key) {
 
     var options = NetworkTables.getValue(nt_key + '/options');
     if (options === undefined)
-        return;
+        return; 
 
     var optDefault = NetworkTables.getValue(nt_key + '/default');
     var selected = NetworkTables.getValue(nt_key + '/selected');

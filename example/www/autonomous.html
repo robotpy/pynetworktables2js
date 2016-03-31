@@ -18,7 +18,7 @@
 <script src="/networktables/utils.js"></script>
 
 <div>
-  Robot: <span id="robotstate">Unknown state</span>
+  Robot: <span id="robotstate">Unknown state</span> @ <span id="robotAddress">disconnected</span>
 </div>
 
 Autonomous: <select id="autonomous"></select>
@@ -28,6 +28,7 @@ Autonomous: <select id="autonomous"></select>
 
 function onRobotConnection(connected) {
 	$('#robotstate').text(connected ? "Connected!" : "Disconnected");
+	$('#robotAddress').text(connected ? NetworkTables.getRobotAddress() : "disconnected");
 }
 
 $(document).ready(function(){

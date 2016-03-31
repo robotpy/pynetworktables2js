@@ -1,5 +1,13 @@
-JavaScript API
-==============
+JS API: NetworkTables
+=====================
+
+To use these functions, add this to your HTML page:
+
+.. code-block:: html
+
+    <script src="/networktables/networktables.js"></script>
+
+**Note**:
 
 It's very important to note that the Javascript NetworkTables API currently
 has no concept of a table or subtable. When referring to keys when accessing
