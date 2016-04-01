@@ -264,12 +264,15 @@ var NetworkTables = new function () {
 	this.putValue = function(key, value) {
 		if (!socketOpen)
 			return false;
-
+		
+		if (value === undefined)
+			throw new Error(key + ": 'undefined' passed to putValue");
+		
 		socket.send(JSON.stringify({'k': key, 'v': value}));
 		return true;
 	};
 
-	// backwards compatibility; depreciated
+	// backwards compatibility; deprecated
 	this.setValue = this.putValue;
 	
 	//
