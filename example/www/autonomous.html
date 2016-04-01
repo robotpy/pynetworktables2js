@@ -18,6 +18,7 @@
 <script src="/networktables/utils.js"></script>
 
 <div>
+  <span id="robotIndicator"></span>
   Robot: <span id="robotstate">Unknown state</span> @ <span id="robotAddress">disconnected</span>
 </div>
 
@@ -34,6 +35,8 @@ function onRobotConnection(connected) {
 $(document).ready(function(){
   // sets a function that will be called when the robot connects/disconnects
 	NetworkTables.addRobotConnectionListener(onRobotConnection, true);
+	
+	attachRobotConnectionIndicator('#robotIndicator');
   
   // attaches the select element to a SendableChooser object
   attachSelectToSendableChooser("#autonomous", "Autonomous Mode");

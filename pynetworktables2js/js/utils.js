@@ -93,4 +93,37 @@ function updateSelectWithChooser(html_id, nt_key) {
     }
 }
 
+/**
+    Creates a circle SVG that turns red when robot is not connected, green when
+    it is connected.
+    
+    :param html_id: ID to insert svg into
+    :param size: Size of circle
+    :param stroke_width: Border of circle
+*/
+function attachRobotConnectionIndicator(html_id, size, stroke_width) {
+    if (!size)
+        size = 20;
+        
+    size = Math.round(size/2.0)*2;
+    
+    if (!stroke_width)
+        stroke_width = Math.ceil(size/10.0);
+    
+    var r = Math.round((size - stroke_width*2)/ 2);
+    
+    var svg = d3.select(html_id).append('svg')
+                                .attr('width', size)
+                                .attr('height', size);
+    var circle = svg.append('circle')
+                    .attr('cx', r + stroke_width)
+                    .attr('cy', r + stroke_width)
+                    .attr('r', r)
+                    .style('stroke', 'black')
+                    .style('stroke-width', stroke_width);
+    
+    NetworkTables.addRobotConnectionListener(function(connected) {
+        circle.style('fill', connected ? 'lime' : 'red');
+    }, true);
+}
 
