@@ -52,7 +52,7 @@ function $s(elem) {
     
     
     .. note:: This has only been tested with mjpg-streamer, but should work for 
-              other webcams as well.
+              other HTTP webcams as well.
 */
 function loadCameraOnConnect(args) {
     /* 
