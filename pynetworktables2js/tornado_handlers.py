@@ -77,10 +77,14 @@ def get_handlers():
                 ])
     '''
     
+    css_path_opts = {'path': abspath(join(dirname(__file__), 'css'))}
     js_path_opts = {'path': abspath(join(dirname(__file__), 'js'))}
+
+    print(css_path_opts)
 
     return [
         ('/networktables/ws', NetworkTablesWebSocket),
-        ('/networktables/(.*)', NonCachingStaticFileHandler, js_path_opts),
+        ('/networktables/css/(.*)', NonCachingStaticFileHandler, css_path_opts),
+        ('/networktables/(.*)', NonCachingStaticFileHandler, js_path_opts)
     ]
 

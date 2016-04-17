@@ -1,0 +1,10 @@
+.tableviewer {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+}
+
+.tableviewer > ul {
+	overflow: hidden;
+	width: calc(100% / 3);
+}

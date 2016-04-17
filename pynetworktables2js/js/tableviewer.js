@@ -8,11 +8,16 @@
 	}
 
 	function Tableviewer($el) {
-		this.$el = $el;
+		this.$el = $el.addClass('tableviewer');
+		var $keys = this.$keys = $('<ul class="keys"></ul>').appendTo($el);
+		var $values = this.$values = $('<ul class="values"></ul>').appendTo($el);
+		var $types = this.$types = $('<ul class="types"></ul>').appendTo($el);
 		this.ntRoot = {
 			'' : {
 				type : 'table',
-				$el : $('<ul></ul>').appendTo($el)
+				$key : $('<ul></ul>').appendTo($keys),
+				$value : $('<ul><ul>').appendTo($values),
+				$type : $('<ul><ul>').appendTo($types)
 			}
 		};
 
@@ -48,10 +53,14 @@
 				}
 
 				// Otherwise the path doesn't exist so add
-				var $li = $('<li>' + step + '</li>').appendTo(this.ntRoot[pathBeforeStep].$el);
+				var $liKey = $('<li>' + step + '</li>').appendTo(this.ntRoot[pathBeforeStep].$key);
+				var $liValue = $('<li></li>').appendTo(this.ntRoot[pathBeforeStep].$value);
+				var $liType = $('<li></li>').appendTo(this.ntRoot[pathBeforeStep].$type);
 				this.ntRoot[pathTraveled] = {
 					type : 'table',
-					$el : $('<ul></ul>').appendTo($li)
+					$key : $('<ul></ul>').appendTo($liKey),
+					$value : $('<ul><ul>').appendTo($liValue),
+					$type : $('<ul><ul>').appendTo($liType)
 				}
 			// Otherwise create value
 			} else {
@@ -62,7 +71,7 @@
 
 				// If path exists and type is not a table then it's a value, so update it.
 				if(this.ntRoot[pathTraveled]) {
-					this.ntRoot[pathTraveled].$el.text(step + ': ' + value);
+					this.ntRoot[pathTraveled].$value.text(value);
 					return;
 				}
 
@@ -70,7 +79,9 @@
 				var type = (typeof(value) === 'object') ? 'array' : typeof(value);
 				this.ntRoot[pathTraveled] = {
 					type : type,
-					$el : $('<li>' + step + ': ' + value + '</li>').appendTo(this.ntRoot[pathBeforeStep].$el)
+					$key : $('<li>' + step + '</li>').appendTo(this.ntRoot[pathBeforeStep].$key),
+					$value : $('<li>' + value + '</li>').appendTo(this.ntRoot[pathBeforeStep].$value),
+					$type : $('<li>' + type + '</li>').appendTo(this.ntRoot[pathBeforeStep].$type)
 				}
 			}
 
