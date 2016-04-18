@@ -9,15 +9,15 @@
 
 	function Tableviewer($el) {
 		this.$el = $el.addClass('tableviewer');
-		var $keys = this.$keys = $('<ul class="keys"></ul>').appendTo($el);
-		var $values = this.$values = $('<ul class="values"></ul>').appendTo($el);
-		var $types = this.$types = $('<ul class="types"></ul>').appendTo($el);
+		var $keyContainer = $('<div class="keys"><span class="title">Key</span><ul></ul></div>').appendTo($el);
+		var $valueContainer = $('<div class="values"><span class="title">Value</span><ul></ul></div>').appendTo($el);
+		var $typeContainer = $('<div class="types"><span class="title">Type</span><ul></ul></div>').appendTo($el);
 		this.ntRoot = {
 			'' : {
 				type : 'table',
-				$key : $('<ul></ul>').appendTo($keys),
-				$value : $('<ul><ul>').appendTo($values),
-				$type : $('<ul><ul>').appendTo($types)
+				$key : $keyContainer.find('ul'),
+				$value : $valueContainer.find('ul'),
+				$type : $typeContainer.find('ul')
 			}
 		};
 
@@ -53,14 +53,14 @@
 				}
 
 				// Otherwise the path doesn't exist so add
-				var $liKey = $('<li>' + step + '</li>').appendTo(this.ntRoot[pathBeforeStep].$key);
-				var $liValue = $('<li></li>').appendTo(this.ntRoot[pathBeforeStep].$value);
-				var $liType = $('<li></li>').appendTo(this.ntRoot[pathBeforeStep].$type);
+				var $liKey = $('<li>' + step + '<ul></ul></li>').appendTo(this.ntRoot[pathBeforeStep].$key);
+				var $liValue = $('<li><ul>&nbsp;</ul></li>').appendTo(this.ntRoot[pathBeforeStep].$value);
+				var $liType = $('<li><ul>&nbsp;</ul></li>').appendTo(this.ntRoot[pathBeforeStep].$type);
 				this.ntRoot[pathTraveled] = {
 					type : 'table',
-					$key : $('<ul></ul>').appendTo($liKey),
-					$value : $('<ul><ul>').appendTo($liValue),
-					$type : $('<ul><ul>').appendTo($liType)
+					$key : $liKey.find('ul'),
+					$value : $liValue.find('ul'),
+					$type : $liType.find('ul')
 				}
 			// Otherwise create value
 			} else {

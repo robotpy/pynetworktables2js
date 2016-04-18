@@ -4,7 +4,31 @@
 	flex-wrap: nowrap;
 }
 
-.tableviewer > ul {
+.tableviewer ul, .tableviewer li {
+	list-style: none;
+}
+
+.tableviewer .keys ul {
+	padding-left: 20px;
+}
+
+.tableviewer .values ul, .tableviewer .types ul {
+	padding-left: 0;
+}
+
+.tableviewer > div {
 	overflow: hidden;
 	width: calc(100% / 3);
+}
+
+.tableviewer > div > ul {
+	padding-left: 10px;
+}
+
+.tableviewer .title {
+	display: block;
+    text-align: center;
+    background: #ddd;
+    font-weight: bold;
+    padding: 3px;
 }
