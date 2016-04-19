@@ -32,3 +32,8 @@
     font-weight: bold;
     padding: 3px;
 }
+
+
+.tableviewer .types li {
+	text-transform: capitalize;
+}

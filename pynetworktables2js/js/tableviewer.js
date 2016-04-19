@@ -71,17 +71,23 @@
 
 				// If path exists and type is not a table then it's a value, so update it.
 				if(this.ntRoot[pathTraveled]) {
-					this.ntRoot[pathTraveled].$value.text(value);
+					// Update type label if array and length of array changes
+					if(this.ntRoot[pathTraveled].type === 'array') {
+						this.ntRoot[pathTraveled].$type.text(value.type + '[' + value.length + ']');
+					}
+					this.ntRoot[pathTraveled].$value.text('&nbsp;' + value);
 					return;
 				}
 
 				// Otherwise path doesn't exist so add
 				var type = (typeof(value) === 'object') ? 'array' : typeof(value);
+				var typeLabel = (type === 'array') ? (value.type + '[' + value.length + ']') : type;
+
 				this.ntRoot[pathTraveled] = {
 					type : type,
-					$key : $('<li>' + step + '</li>').appendTo(this.ntRoot[pathBeforeStep].$key),
-					$value : $('<li>' + value + '</li>').appendTo(this.ntRoot[pathBeforeStep].$value),
-					$type : $('<li>' + type + '</li>').appendTo(this.ntRoot[pathBeforeStep].$type)
+					$key : $('<li>&nbsp;' + step + '</li>').appendTo(this.ntRoot[pathBeforeStep].$key),
+					$value : $('<li>&nbsp;' + value + '</li>').appendTo(this.ntRoot[pathBeforeStep].$value),
+					$type : $('<li>&nbsp;' + type + '</li>').appendTo(this.ntRoot[pathBeforeStep].$type)
 				}
 			}
 
