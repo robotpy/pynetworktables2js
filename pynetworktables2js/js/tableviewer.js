@@ -9,15 +9,11 @@
 
 	function Tableviewer($el) {
 		this.$el = $el.addClass('tableviewer');
-		var $keyContainer = $('<div class="keys"><span class="title">Key</span><ul></ul></div>').appendTo($el);
-		var $valueContainer = $('<div class="values"><span class="title">Value</span><ul></ul></div>').appendTo($el);
-		var $typeContainer = $('<div class="types"><span class="title">Type</span><ul></ul></div>').appendTo($el);
+		var $el = $('<ul>Root</ul>').appendTo($el);
 		this.ntRoot = {
 			'' : {
 				type : 'table',
-				$key : $keyContainer.find('ul'),
-				$value : $valueContainer.find('ul'),
-				$type : $typeContainer.find('ul')
+				$el : $('<ul>Root</ul>').appendTo($el)
 			}
 		};
 
@@ -53,14 +49,10 @@
 				}
 
 				// Otherwise the path doesn't exist so add
-				var $liKey = $('<li>' + step + '<ul></ul></li>').appendTo(this.ntRoot[pathBeforeStep].$key);
-				var $liValue = $('<li><ul>&nbsp;</ul></li>').appendTo(this.ntRoot[pathBeforeStep].$value);
-				var $liType = $('<li><ul>&nbsp;</ul></li>').appendTo(this.ntRoot[pathBeforeStep].$type);
+				var $el = $('<li>' + step + '<ul></ul></li>').appendTo(this.ntRoot[pathBeforeStep].$el);
 				this.ntRoot[pathTraveled] = {
 					type : 'table',
-					$key : $liKey.find('ul'),
-					$value : $liValue.find('ul'),
-					$type : $liType.find('ul')
+					$el : $el.find('ul'),
 				}
 			// Otherwise create value
 			} else {
@@ -83,11 +75,14 @@
 				var type = (typeof(value) === 'object') ? 'array' : typeof(value);
 				var typeLabel = (type === 'array') ? (value.type + '[' + value.length + ']') : type;
 
+				var $el = $('<li></li>').appendTo(this.ntRoot[pathBeforeStep].$el);
+				
 				this.ntRoot[pathTraveled] = {
 					type : type,
-					$key : $('<li>&nbsp;' + step + '</li>').appendTo(this.ntRoot[pathBeforeStep].$key),
-					$value : $('<li>&nbsp;' + value + '</li>').appendTo(this.ntRoot[pathBeforeStep].$value),
-					$type : $('<li>&nbsp;' + type + '</li>').appendTo(this.ntRoot[pathBeforeStep].$type)
+					$el : $el,
+					$key : $('<span class="key">' + step + '</span>').appendTo($el),
+					$value : $('<span class="value">' + value + '</span>').appendTo($el),
+					$type : $('<span class="type">' + type + '</span>').appendTo($el)
 				}
 			}
 
