@@ -9,7 +9,6 @@
 
 	function Tableviewer($el) {
 		this.$el = $el.addClass('tableviewer');
-		var $el = $('<ul>Root</ul>').appendTo($el);
 		this.ntRoot = {
 			'' : {
 				type : 'table',
@@ -54,7 +53,7 @@
 				}
 
 				// Otherwise the path doesn't exist so add
-				var $el = $('<li><button class="expanded"></button>' + step + '<ul></ul></li>')
+				var $el = $('<li class="table"><button class="expanded"></button>' + step + '<ul></ul></li>')
 					.appendTo(this.ntRoot[pathBeforeStep].$el);
 				this.ntRoot[pathTraveled] = {
 					type : 'table',
@@ -81,14 +80,29 @@
 				var type = (typeof(value) === 'object') ? 'array' : typeof(value);
 				var typeLabel = (type === 'array') ? (value.type + '[' + value.length + ']') : type;
 
-				var $el = $('<li></li>').appendTo(this.ntRoot[pathBeforeStep].$el);
-				
-				this.ntRoot[pathTraveled] = {
-					type : type,
-					$el : $el,
-					$key : $('<span class="key">' + step + '</span>').appendTo($el),
-					$value : $('<span class="value">' + value + '</span>').appendTo($el),
-					$type : $('<span class="type">' + type + '</span>').appendTo($el)
+				if(type === 'array') {
+					var $el = $('<li class="array"><button class="expanded"></button>' + step + '<ul></ul></li>')
+						.appendTo(this.ntRoot[pathBeforeStep].$el);
+
+					this.ntRoot[pathTraveled] = {
+						type : type,
+						$el : $el,
+						$values : $el.find('ul')
+					};
+				} else {
+					var $el = $('<li class="value"></li>')
+						.append('<span class="key">' + step + '</span>')
+						.append('<span class="value">' + value + '</span>')
+						.append('<span class="type">' + type + '</span>')
+						.appendTo(this.ntRoot[pathBeforeStep].$el);
+
+					this.ntRoot[pathTraveled] = {
+						type : type,
+						$el : $el,
+						$key : $el.find('.key'),
+						$value : $el.find('.value'),
+						$type : $el.find('.type')
+					};
 				}
 			}
 

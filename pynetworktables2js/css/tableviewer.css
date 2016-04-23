@@ -1,41 +1,22 @@
-.tableviewer {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: nowrap;
-}
 
 .tableviewer ul, .tableviewer li {
 	list-style: none;
 }
 
-.tableviewer .keys ul {
-	padding-left: 20px;
-}
-
-.tableviewer .values ul, .tableviewer .types ul {
+.tableviewer ul {
 	padding-left: 0;
 }
 
-.tableviewer > div {
-	overflow: hidden;
-	width: calc(100% / 3);
+.tableviewer li.value {
+	padding-left: 25px;
 }
 
-.tableviewer > div > ul {
-	padding-left: 10px;
+.tableviewer li.table, .tableviewer li.array {
+	padding-left: 19px;
 }
 
-.tableviewer .title {
-	display: block;
-    text-align: center;
-    background: #ddd;
-    font-weight: bold;
-    padding: 3px;
-}
-
-
-.tableviewer .types li {
-	text-transform: capitalize;
+.tableviewer > ul {
+	padding-left: 0;
 }
 
 .tableviewer button.expanded, .tableviewer button.collapsed {
@@ -54,4 +35,29 @@
 
 .tableviewer button.collapsed + ul {
 	display: none;
+}
+
+
+.tableviewer .key::after {
+	content: ":";
+	display: inline-block;
+	padding: 0 10px;
+}
+
+.tableviewer span.type {
+	text-transform: capitalize;
+	color: #aaa;
+	font-size: x-small;
+	margin-left: 10px;
+	display: inline-block;
+    bottom: 2px;
+    position: relative;
+}
+
+.tableviewer span.type::before {
+	content: "(";
+}
+
+.tableviewer span.type::after {
+	content: ")";
 }
