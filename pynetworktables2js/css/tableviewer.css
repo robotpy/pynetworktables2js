@@ -37,3 +37,21 @@
 .tableviewer .types li {
 	text-transform: capitalize;
 }
+
+.tableviewer button.expanded, .tableviewer button.collapsed {
+	background: none;
+    border: none;
+    outline: none;
+}
+
+.tableviewer button.expanded::before {
+	content: "▼";
+}
+
+.tableviewer button.collapsed::before {
+	content: "▶";
+}
+
+.tableviewer button.collapsed + ul {
+	display: none;
+}

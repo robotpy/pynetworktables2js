@@ -21,6 +21,11 @@
 		NetworkTables.addGlobalListener(function(key, value, isNew) {
 			that._putValue(key, value, 0);
 		}, true);
+
+		// Expand/Collabse tables
+		$el.on('click', '.expanded, .collapsed', function(e) {
+			$(this).toggleClass('expanded collapsed');
+		});
 	}
 
 	Tableviewer.prototype.printTable = function() {
@@ -49,7 +54,8 @@
 				}
 
 				// Otherwise the path doesn't exist so add
-				var $el = $('<li>' + step + '<ul></ul></li>').appendTo(this.ntRoot[pathBeforeStep].$el);
+				var $el = $('<li><button class="expanded"></button>' + step + '<ul></ul></li>')
+					.appendTo(this.ntRoot[pathBeforeStep].$el);
 				this.ntRoot[pathTraveled] = {
 					type : 'table',
 					$el : $el.find('ul'),
