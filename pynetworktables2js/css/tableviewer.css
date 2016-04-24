@@ -7,7 +7,7 @@
 	padding-left: 0;
 }
 
-.tableviewer li.value {
+.tableviewer li.boolean, .tableviewer li.number, .tableviewer li.string {
 	padding-left: 25px;
 }
 
@@ -48,16 +48,8 @@
 	text-transform: capitalize;
 	color: #aaa;
 	font-size: x-small;
-	margin-left: 10px;
+	margin-left: 13px;
 	display: inline-block;
     bottom: 2px;
     position: relative;
-}
-
-.tableviewer span.type::before {
-	content: "(";
-}
-
-.tableviewer span.type::after {
-	content: ")";
 }

@@ -34,79 +34,152 @@
 	Tableviewer.prototype._putValue = function(key, value) {
 		var steps = key.split('/').filter(function(s) { return s.length > 0; });
 
-		var pathTraveled = '';
-		for(var i = 0 ; i < steps.length; i++) {
-			var step = steps[i];
-			var pathBeforeStep  = pathTraveled;
-			pathTraveled += '/' + step;
+		var parentPath = '';
 
-			// If not last step create table.
-			if(i < steps.length - 1) {
-				// If path exists and is a table skip this step.
-				if(this.ntRoot[pathTraveled] && this.ntRoot[pathTraveled].type === 'table') {
-					continue;
-				}
-
-				// If path exists and is not a table then it's a value. The value being added/updated is invalid
-				if(this.ntRoot[pathTraveled]) {
-					return;
-				}
-
-				// Otherwise the path doesn't exist so add
-				var $el = $('<li class="table"><button class="expanded"></button>' + step + '<ul></ul></li>')
-					.appendTo(this.ntRoot[pathBeforeStep].$el);
-				this.ntRoot[pathTraveled] = {
-					type : 'table',
-					$el : $el.find('ul'),
-				}
-			// Otherwise create value
-			} else {
-				// If value type is table then value being added/updated is invalid so skip
-				if(this.ntRoot[pathTraveled] && this.ntRoot[pathTraveled].type === 'table') {
-					return;
-				}
-
-				// If path exists and type is not a table then it's a value, so update it.
-				if(this.ntRoot[pathTraveled]) {
-					// Update type label if array and length of array changes
-					if(this.ntRoot[pathTraveled].type === 'array') {
-						this.ntRoot[pathTraveled].$type.text(value.type + '[' + value.length + ']');
-					}
-					this.ntRoot[pathTraveled].$value.text('&nbsp;' + value);
-					return;
-				}
-
-				// Otherwise path doesn't exist so add
-				var type = (typeof(value) === 'object') ? 'array' : typeof(value);
-				var typeLabel = (type === 'array') ? (value.type + '[' + value.length + ']') : type;
-
-				if(type === 'array') {
-					var $el = $('<li class="array"><button class="expanded"></button>' + step + '<ul></ul></li>')
-						.appendTo(this.ntRoot[pathBeforeStep].$el);
-
-					this.ntRoot[pathTraveled] = {
-						type : type,
-						$el : $el,
-						$values : $el.find('ul')
-					};
-				} else {
-					var $el = $('<li class="value"></li>')
-						.append('<span class="key">' + step + '</span>')
-						.append('<span class="value">' + value + '</span>')
-						.append('<span class="type">' + type + '</span>')
-						.appendTo(this.ntRoot[pathBeforeStep].$el);
-
-					this.ntRoot[pathTraveled] = {
-						type : type,
-						$el : $el,
-						$key : $el.find('.key'),
-						$value : $el.find('.value'),
-						$type : $el.find('.type')
-					};
-				}
+		for(var i = 0 ; i < steps.length - 1; i++) {
+			if(!this._createTableNode(parentPath, steps[i])) {
+				return;
 			}
-
+			parentPath += '/' + steps[i];
 		}
+
+		var type = typeof(value);
+		var step = steps[steps.length - 1];
+		var path = parentPath + '/' + step;
+
+		// Create node if it doesn't exist
+		if(!this.ntRoot[path]) {
+			if(type === 'object') {
+				this._createArrayNode(parentPath, step, value);
+			} else if(type === 'boolean') {
+				this._createBooleanNode(parentPath, step, value);
+			} else if(type === 'number') {
+				this._createNumberNode(parentPath, step, value);
+			} else {
+				this._createStringNode(parentPath, step, value);
+			}
+		}
+
+		// Update the value				
+		if(type === 'object') {
+			this._updateArray(path, value);
+		} else if(type === 'boolean') {
+			this._updateBoolean(path, value);	
+		} else if(type === 'number') {
+			this._updateNumber(path, value);	
+		} else {
+			this._updateString(path, value);	
+		}
+	};
+
+	Tableviewer.prototype._updateArray = function(path, value) {
+		// this.ntRoot[pathTraveled].$type.text(value.type + '[' + value.length + ']');
+		this.ntRoot[path].$type.text('Array[' + value.length + ']');
+	};
+
+	Tableviewer.prototype._updateBoolean = function(path, value) {
+		this.ntRoot[path].$value.text(value);
+	};
+
+	Tableviewer.prototype._updateNumber = function(path, value) {
+		this.ntRoot[path].$value.text(value);
+	};
+
+	Tableviewer.prototype._updateString = function(path, value) {
+		this.ntRoot[path].$value.text(value);
+	};
+
+	Tableviewer.prototype._createTableNode = function(parentPath, step) {
+
+		var path = parentPath + '/' + step;
+
+		// If path exists and is not a table then it's a value. The value being added/updated is invalid
+		if(this.ntRoot[path] && this.ntRoot[path].type !== 'table') {
+			return false;
+		}
+
+		if(!this.ntRoot[path]) {
+			// Otherwise the path doesn't exist so add
+			var $el = $('<li class="table"><button class="expanded"></button>' + step + '<ul></ul></li>')
+				.appendTo(this.ntRoot[parentPath].$el);
+			
+			this.ntRoot[path] = {
+				type : 'table',
+				$el : $el.find('ul'),
+			}
+		}
+
+		return true;
+	};
+
+	Tableviewer.prototype._createArrayNode = function(parentPath, step, value) {
+		var path = parentPath + '/' + step;
+		//var typeLabel = value.type + '[' + value.length + ']';
+		var $el = $('<li class="array">' +
+						'<button class="expanded"></button>' + 
+						step + 
+						'<span class="type">Array[' + value.length + ']</span>' +
+						'<ul></ul>' +
+					'</li>')
+			.appendTo(this.ntRoot[parentPath].$el);
+
+		this.ntRoot[path] = {
+			type : 'array',
+			$el : $el,
+			$type : $el.find('.type'),
+			$values : $el.find('ul'),
+		};
+	};
+
+	Tableviewer.prototype._createBooleanNode = function(parentPath, step, value) {
+		var path = parentPath + '/' + step;
+		var $el = $('<li class="boolean"></li>')
+			.append('<span class="key">' + step + '</span>')
+			.append('<span class="value"></span>')
+			.append('<span class="type">boolean</span>')
+			.appendTo(this.ntRoot[parentPath].$el);
+
+		this.ntRoot[path] = {
+			type : 'boolean',
+			$el : $el,
+			$key : $el.find('.key'),
+			$value : $el.find('.value'),
+			$type : $el.find('.type')
+		};
+	};
+
+	Tableviewer.prototype._createNumberNode = function(parentPath, step, value) {
+		var path = parentPath + '/' + step;
+		var $el = $('<li class="number"></li>')
+			.append('<span class="key">' + step + '</span>')
+			.append('<span class="value"></span>')
+			.append('<span class="type">number</span>')
+			.appendTo(this.ntRoot[parentPath].$el);
+
+		this.ntRoot[path] = {
+			type : 'number',
+			$el : $el,
+			$key : $el.find('.key'),
+			$value : $el.find('.value'),
+			$type : $el.find('.type')
+		};
+	};
+
+	Tableviewer.prototype._createStringNode = function(parentPath, step, value) {
+		var path = parentPath + '/' + step;
+		var $el = $('<li class="string"></li>')
+			.append('<span class="key">' + step + '</span>')
+			.append('<span class="value"></span>')
+			.append('<span class="type">string</span>')
+			.appendTo(this.ntRoot[parentPath].$el);
+
+		this.ntRoot[path] = {
+			type : 'string',
+			$el : $el,
+			$key : $el.find('.key'),
+			$value : $el.find('.value'),
+			$type : $el.find('.type')
+		};
 	};
 
 
