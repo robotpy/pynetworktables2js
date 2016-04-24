@@ -16,15 +16,21 @@
 			}
 		};
 
-		var that = this;
-		NetworkTables.addGlobalListener(function(key, value, isNew) {
-			that._putValue(key, value, 0);
-		}, true);
-
 		// Expand/Collabse tables
 		$el.on('click', '.expanded, .collapsed', function(e) {
 			$(this).toggleClass('expanded collapsed');
 		});
+
+		// Resize number input based on length of input
+		$el.on('change keyup', '[type=number]', function(e) {
+			var length = $(this).val().length;
+			$(this).width(20 + 6.1 * length);
+		});
+
+		var that = this;
+		NetworkTables.addGlobalListener(function(key, value, isNew) {
+			that._putValue(key, value, 0);
+		}, true);
 	}
 
 	Tableviewer.prototype.printTable = function() {
@@ -78,11 +84,12 @@
 	};
 
 	Tableviewer.prototype._updateBoolean = function(path, value) {
-		this.ntRoot[path].$value.text(value);
+		this.ntRoot[path].$value.prop('checked', value);
 	};
 
 	Tableviewer.prototype._updateNumber = function(path, value) {
-		this.ntRoot[path].$value.text(value);
+		this.ntRoot[path].$value.val(value);
+		this.ntRoot[path].$value.trigger('change');
 	};
 
 	Tableviewer.prototype._updateString = function(path, value) {
@@ -135,7 +142,7 @@
 		var path = parentPath + '/' + step;
 		var $el = $('<li class="boolean"></li>')
 			.append('<span class="key">' + step + '</span>')
-			.append('<span class="value"></span>')
+			.append('<input type="checkbox" class="value"/>')
 			.append('<span class="type">boolean</span>')
 			.appendTo(this.ntRoot[parentPath].$el);
 
@@ -152,7 +159,7 @@
 		var path = parentPath + '/' + step;
 		var $el = $('<li class="number"></li>')
 			.append('<span class="key">' + step + '</span>')
-			.append('<span class="value"></span>')
+			.append('<input type="number" step="any" class="value"/>')
 			.append('<span class="type">number</span>')
 			.appendTo(this.ntRoot[parentPath].$el);
 

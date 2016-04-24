@@ -53,3 +53,21 @@
     bottom: 2px;
     position: relative;
 }
+
+.tableviewer .number span.type {
+	margin-left: 0;
+}
+
+
+.tableviewer input[type=number] {
+	position: relative;
+	border: none;
+	outline: none;
+	padding-left: 10px;
+}
+
+.tableviewer input[type="number"]::-webkit-outer-spin-button, 
+.tableviewer input[type="number"]::-webkit-inner-spin-button {
+	position: absolute;
+	left: -5px;
+}
