@@ -23,9 +23,22 @@
 
 		// Resize number input based on length of input
 		$el.on('change keyup', '[type=number]', function(e) {
-			var length = $(this).val().length;
-			$(this).width(20 + 6.1 * length);
+			var text = $(this).val();
+			var length = text.length;
+			var $phantomInput = $(this).next();
+			$phantomInput.text(text);
+			$(this).css('max-width', 13 + $phantomInput.width());
 		});
+
+		$el.on('change keyup', '[type=text]', function(e) {
+			var text = $(this).val();
+			var length = text.length;
+			var $phantomInput = $(this).next();
+			$phantomInput.text(text);
+			//$(this).attr('size', length);
+			$(this).css('max-width', 10 + $phantomInput.width());
+		});
+
 
 		var that = this;
 		NetworkTables.addGlobalListener(function(key, value, isNew) {
@@ -93,7 +106,8 @@
 	};
 
 	Tableviewer.prototype._updateString = function(path, value) {
-		this.ntRoot[path].$value.text(value);
+		this.ntRoot[path].$value.val(value);
+		this.ntRoot[path].$value.trigger('change');
 	};
 
 	Tableviewer.prototype._createTableNode = function(parentPath, step) {
@@ -160,6 +174,7 @@
 		var $el = $('<li class="number"></li>')
 			.append('<span class="key">' + step + '</span>')
 			.append('<input type="number" step="any" class="value"/>')
+			.append('<span class="phantom-input"></span>')
 			.append('<span class="type">number</span>')
 			.appendTo(this.ntRoot[parentPath].$el);
 
@@ -168,6 +183,7 @@
 			$el : $el,
 			$key : $el.find('.key'),
 			$value : $el.find('.value'),
+			$phantomInput : $el.find('.phantom-input'),
 			$type : $el.find('.type')
 		};
 	};
@@ -176,7 +192,8 @@
 		var path = parentPath + '/' + step;
 		var $el = $('<li class="string"></li>')
 			.append('<span class="key">' + step + '</span>')
-			.append('<span class="value"></span>')
+			.append('&ldquo;<input type="text" class="value"/>&rdquo;')
+			.append('<span class="phantom-input"></span>')
 			.append('<span class="type">string</span>')
 			.appendTo(this.ntRoot[parentPath].$el);
 
@@ -185,6 +202,7 @@
 			$el : $el,
 			$key : $el.find('.key'),
 			$value : $el.find('.value'),
+			$phantomInput : $el.find('.phantom-input'),
 			$type : $el.find('.type')
 		};
 	};

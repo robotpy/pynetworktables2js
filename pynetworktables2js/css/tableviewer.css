@@ -64,10 +64,42 @@
 	border: none;
 	outline: none;
 	padding-left: 10px;
+	width: 100%;
+	text-overflow: ellipsis;
+}
+
+.tableviewer li.string, .tableviewer li.number {
+	display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.tableviewer li.string .key, .tableviewer li.number .key {
+	display: flex;
 }
 
 .tableviewer input[type="number"]::-webkit-outer-spin-button, 
 .tableviewer input[type="number"]::-webkit-inner-spin-button {
 	position: absolute;
 	left: -5px;
+}
+
+
+.tableviewer input[type=text] {
+	width: 100%;
+	border: none;
+	outline: none;
+	text-overflow: ellipsis;
+	margin: 0 3px;
+}
+
+.tableviewer .phantom-input {
+	position: absolute;
+	visibility: hidden;
+	-webkit-user-select: none;
+}
+
+.tableviewer input, .tableviewer .phantom-input {
+	font-family: "Times New Roman", Times, serif;
+	font-size: 12px;
 }
