@@ -22,7 +22,7 @@
 		});
 
 		// Resize number input based on length of input
-		$el.on('change keyup', '[type=number]', function(e) {
+		$el.on('change keyup ntUpdate', '[type=number]', function(e) {
 			var text = $(this).val();
 			var length = text.length;
 			var $phantomInput = $(this).next();
@@ -30,13 +30,27 @@
 			$(this).css('max-width', 13 + $phantomInput.width());
 		});
 
-		$el.on('change keyup', '[type=text]', function(e) {
+		$el.on('change keyup ntUpdate', '[type=text]', function(e) {
 			var text = $(this).val();
 			var length = text.length;
 			var $phantomInput = $(this).next();
 			$phantomInput.text(text);
 			//$(this).attr('size', length);
 			$(this).css('max-width', 10 + $phantomInput.width());
+		});
+
+		// Update NetworkTables
+		$el.on('change', '[type=checkbox]', function(e) {
+			var key = $(this).parents('[data-path]').data('path');
+			var value = $(this).prop('checked');
+			NetworkTables.putValue(key, value);
+		});
+
+		$el.on('change', '[type=text], [type=number]', function(e) {
+			var key = $(this).parents('[data-path]').data('path');
+			var value = $(this).val();
+			alert(key + ', ' + value);
+			NetworkTables.putValue(key, value);
 		});
 
 
@@ -141,12 +155,12 @@
 
 	Tableviewer.prototype._updateNumber = function(path, value) {
 		this.ntRoot[path].$value.val(value);
-		this.ntRoot[path].$value.trigger('change');
+		this.ntRoot[path].$value.trigger('ntUpdate');
 	};
 
 	Tableviewer.prototype._updateString = function(path, value) {
 		this.ntRoot[path].$value.val(value);
-		this.ntRoot[path].$value.trigger('change');
+		this.ntRoot[path].$value.trigger('ntUpdate');
 	};
 
 	Tableviewer.prototype._createTableNode = function(parentPath, step) {
@@ -175,7 +189,7 @@
 	Tableviewer.prototype._createArrayNode = function(parentPath, step, value) {
 		var path = parentPath + '/' + step;
 		//var typeLabel = value.type + '[' + value.length + ']';
-		var $el = $('<li class="array">' +
+		var $el = $('<li class="array" data-path="' + path + '">' +
 						'<button class="expanded"></button>' + 
 						step + 
 						'<span class="type">Array[' + value.length + ']</span>' +
@@ -192,7 +206,7 @@
 
 	Tableviewer.prototype._createBooleanNode = function(parentPath, step, value) {
 		var path = parentPath + '/' + step;
-		var $el = $('<li class="boolean"></li>')
+		var $el = $('<li class="boolean" data-path="' + path + '"></li>')
 			.append('<span class="key">' + step + '</span>')
 			.append('<input type="checkbox" class="value"/>')
 			.append('<span class="type">boolean</span>')
@@ -209,7 +223,7 @@
 
 	Tableviewer.prototype._createNumberNode = function(parentPath, step, value) {
 		var path = parentPath + '/' + step;
-		var $el = $('<li class="number"></li>')
+		var $el = $('<li class="number" data-path="' + path + '"></li>')
 			.append('<span class="key">' + step + '</span>')
 			.append('<input type="number" step="any" class="value"/>')
 			.append('<span class="phantom-input"></span>')
@@ -228,7 +242,7 @@
 
 	Tableviewer.prototype._createStringNode = function(parentPath, step, value) {
 		var path = parentPath + '/' + step;
-		var $el = $('<li class="string"></li>')
+		var $el = $('<li class="string" data-path="' + path + '"></li>')
 			.append('<span class="key">' + step + '</span>')
 			.append('&ldquo;<input type="text" class="value"/>&rdquo;')
 			.append('<span class="phantom-input"></span>')
