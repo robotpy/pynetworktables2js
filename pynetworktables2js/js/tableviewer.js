@@ -46,11 +46,16 @@
 			NetworkTables.putValue(key, value);
 		});
 
-		$el.on('change', '[type=text], [type=number]', function(e) {
+		$el.on('change', '[type=text]', function(e) {
 			var key = $(this).parents('[data-path]').data('path');
 			var value = $(this).val();
-			alert(key + ', ' + value);
 			NetworkTables.putValue(key, value);
+		});
+
+		$el.on('change', '[type=number]', function(e) {
+			var key = $(this).parents('[data-path]').data('path');
+			var value = parseFloat($(this).val());
+			NetworkTables.putValue(key, parseFloat(value));
 		});
 
 
