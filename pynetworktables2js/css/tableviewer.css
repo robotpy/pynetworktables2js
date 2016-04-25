@@ -33,7 +33,7 @@
 	content: "▶";
 }
 
-.tableviewer button.collapsed + ul {
+.tableviewer button.collapsed + ul, .tableviewer button.collapsed + span + ul {
 	display: none;
 }
 
@@ -102,4 +102,8 @@
 .tableviewer input, .tableviewer .phantom-input {
 	font-family: "Times New Roman", Times, serif;
 	font-size: 12px;
+}
+
+.tableviewer .array ul .type {
+	display: none;
 }

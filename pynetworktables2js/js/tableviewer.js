@@ -91,9 +91,48 @@
 		}
 	};
 
-	Tableviewer.prototype._updateArray = function(path, value) {
+	Tableviewer.prototype._updateArray = function(path, values) {
 		// this.ntRoot[pathTraveled].$type.text(value.type + '[' + value.length + ']');
-		this.ntRoot[path].$type.text('Array[' + value.length + ']');
+		var type = 'array';
+
+		for(var i = 0; i < values.length; i++) {
+			var value = values[i];
+			type = typeof(value);
+
+			// Create array elements
+			if(!this.ntRoot[path + '/' + i]) {
+				if(type === 'boolean') {
+					this._createBooleanNode(path, i, value);
+				} else if(type === 'number') {
+					this._createNumberNode(path, i, value);
+				} else {
+					this._createStringNode(path, i, value);
+				}
+
+				// Disable the input
+				this.ntRoot[path + '/' + i].$value.prop('disabled', true);
+			}
+
+			// Update the value
+			if(type === 'boolean') {
+				this._updateBoolean(path + '/' + i, value);
+			} else if(type === 'number') {
+				this._updateNumber(path + '/' + i, value);
+			} else {
+				this._updateString(path + '/' + i, value);
+			}
+
+		}
+
+		// Remove array elements
+		var $items = this.ntRoot[path].$el.find('li');
+		for(var i = values.length; i < $items.length; i++) {
+			delete this.ntRoot[path + '/' + i];
+			$items[i].remove();
+		}
+
+		// Set the type label
+		this.ntRoot[path].$type.text(type + '[' + values.length + ']');
 	};
 
 	Tableviewer.prototype._updateBoolean = function(path, value) {
@@ -146,9 +185,8 @@
 
 		this.ntRoot[path] = {
 			type : 'array',
-			$el : $el,
-			$type : $el.find('.type'),
-			$values : $el.find('ul'),
+			$el : $el.find('ul'),
+			$type : $el.find('.type')
 		};
 	};
 
