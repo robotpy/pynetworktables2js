@@ -334,7 +334,7 @@
 
 		if(!this.ntRoot[path]) {
 			// Otherwise the path doesn't exist so add
-			var $el = $('<li class="table" data-path="' + path + '"><button class="expanded"></button>' + step + '<ul></ul></li>')
+			var $el = $('<li class="table" data-path="' + path + '"><button class="collapsed"></button>' + step + '<ul></ul></li>')
 				.appendTo(this.ntRoot[parentPath].$el);
 			
 			this.ntRoot[path] = {
@@ -350,7 +350,7 @@
 		var path = parentPath + '/' + step;
 		//var typeLabel = value.type + '[' + value.length + ']';
 		var $el = $('<li class="array" data-path="' + path + '">' +
-						'<button class="expanded"></button>' + 
+						'<button class="collapsed"></button>' + 
 						step + 
 						'<span class="type">Array[' + value.length + ']</span>' +
 						'<ul></ul>' +
