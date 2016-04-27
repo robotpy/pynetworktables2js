@@ -59,12 +59,77 @@
 			NetworkTables.putValue(key, value);
 		});
 
-
 		var that = this;
+
+		// Show context menu for inserting values
+		this._createContextMenu();
+
+
+
 		NetworkTables.addGlobalListener(function(key, value, isNew) {
 			that._putValue(key, value, 0);
 		}, true);
 	}
+
+	Tableviewer.prototype._createContextMenu = function() {
+		var $contextMenu = $('<div class="contextmenu" style="display: none">' +
+								'<span class="add-string">Add String</span>' + 
+								'<span class="add-number">Add Number</span>' + 
+								'<span class="add-boolean">Add Boolean</span>' + 
+							'</div>').appendTo(this.$el);
+
+		this.contextMenu = {
+			$el : $contextMenu,
+			$addString : $contextMenu.find('.add-string'),
+			$addNumber : $contextMenu.find('.add-number'),
+			$addBoolean : $contextMenu.find('.add-boolean')
+		};
+
+		var that = this;
+
+		var key = '';
+
+		this.$el.on('contextmenu', 'li.table, li.table > *', function(e) {
+			var $target = $(e.target);
+			var $table = $target.hasClass('table') ? $target : $target.parent();
+			if($table.hasClass('table')) {
+				e.preventDefault();
+				key = $table.attr('data-path');
+				that._openContextMenu(e.pageX - that.$el.offset().left, e.pageY - that.$el.offset().top);
+			} else {
+				that._closeContextMenu();
+			}
+		});
+
+		this.contextMenu.$addString.on('click', function(e) {
+			that._showModal(key + '/', 'string');
+		});
+
+		this.contextMenu.$addNumber.on('click', function(e) {
+			that._showModal(key + '/', 'number');
+		});
+
+		this.contextMenu.$addBoolean.on('click', function(e) {
+			that._showModal(key + '/', 'boolean');
+		});
+
+		this.$el.on('click', function(e) {
+			that._closeContextMenu();
+		});
+	};
+
+	Tableviewer.prototype._openContextMenu = function(x, y) {
+		this.contextMenu.$el.css({
+			'display' : 'block',
+			'left' : x,
+			'top' : y
+		});
+
+	};
+
+	Tableviewer.prototype._closeContextMenu = function() {
+		this.contextMenu.$el.css('display', 'none');
+	};
 
 
 	Tableviewer.prototype._createModal = function() {
@@ -269,7 +334,7 @@
 
 		if(!this.ntRoot[path]) {
 			// Otherwise the path doesn't exist so add
-			var $el = $('<li class="table"><button class="expanded"></button>' + step + '<ul></ul></li>')
+			var $el = $('<li class="table" data-path="' + path + '"><button class="expanded"></button>' + step + '<ul></ul></li>')
 				.appendTo(this.ntRoot[parentPath].$el);
 			
 			this.ntRoot[path] = {

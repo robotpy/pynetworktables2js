@@ -1,4 +1,8 @@
 
+.tableviewer {
+	position: relative;
+}
+
 .tableviewer ul, .tableviewer li {
 	list-style: none;
 }
@@ -187,4 +191,22 @@
 
 .tableviewer-modal .title .type-label {
 	text-transform: capitalize;
+}
+
+.tableviewer .contextmenu {
+	position: absolute;
+	border: 1px solid black;
+}
+
+.tableviewer .contextmenu span {
+	display: block;
+	width: 120px;
+	padding: 5px 10px;
+	text-align: left;
+	background: white;
+	cursor: pointer;
+}
+
+.tableviewer .contextmenu span:hover {
+	background: #aaa;
 }
