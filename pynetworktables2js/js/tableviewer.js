@@ -16,6 +16,8 @@
 			}
 		};
 
+		this._createModal();
+
 		// Expand/Collabse tables
 		$el.on('click', '.expanded, .collapsed', function(e) {
 			$(this).toggleClass('expanded collapsed');
@@ -35,7 +37,6 @@
 			var length = text.length;
 			var $phantomInput = $(this).next();
 			$phantomInput.text(text);
-			//$(this).attr('size', length);
 			$(this).css('max-width', 10 + $phantomInput.width());
 		});
 
@@ -55,7 +56,7 @@
 		$el.on('change', '[type=number]', function(e) {
 			var key = $(this).parents('[data-path]').data('path');
 			var value = parseFloat($(this).val());
-			NetworkTables.putValue(key, parseFloat(value));
+			NetworkTables.putValue(key, value);
 		});
 
 
@@ -64,6 +65,95 @@
 			that._putValue(key, value, 0);
 		}, true);
 	}
+
+
+	Tableviewer.prototype._createModal = function() {
+
+		var $modal = $('<div class="tableviewer-modal" style="display: none">' +
+							'<div class="close">&times;</div>' +
+							'<div class="title">Put <span class="type-label">Value</span></div>' +
+							'<div class="body" data-type="string">' +
+								'<input type="hidden" class="parent-path"/>' +
+								'<div class="input-row key"><label>Key:</label><input type="text" class="key" value=""/></div>' +
+								'<div class="add-string input-row"><label>Value:</label><input type="text" value=""/></div>' +
+								'<div class="add-number input-row"><label>Value:</label><input type="number" value=""/></div>' +
+								'<div class="add-boolean input-row"><label>Value:</label><input type="checkbox"/></div>' +
+								'<div class="buttons"><button class="ok">ok</button><button class="cancel">cancel</button></div>' +
+							'</div>' + 
+						'</div>').appendTo('body');
+
+		var $modalOverlay = $('<div class="tableviewer-modal-overlay" style="display: none"></div>').appendTo('body');
+
+		this.modal = {
+			$el : $modal,
+			$body : $modal.find('.body'),
+			$typeLabel : $modal.find('.title .type-label'),
+			$close : $modal.find('.close'),
+			$key : $modal.find('.key input'),
+			$parentPath : $modal.find('.parent-path'),
+			$addString : $modal.find('.add-string'),
+			$addStringInput : $modal.find('.add-string input'),
+			$addNumber : $modal.find('.add-number'),
+			$addNumberInput : $modal.find('.add-number input'),
+			$addBoolean : $modal.find('.add-boolean'),
+			$addBooleanInput : $modal.find('.add-boolean input'),
+			$okButton : $modal.find('.buttons .ok'),
+			$cancelButton : $modal.find('.buttons .cancel'),
+			$overlay : $modalOverlay
+		};
+
+
+		// Add events
+		var that = this;
+
+		var closeSelectors = [
+			'.tableviewer-modal .close',
+			'.tableviewer-modal .buttons .cancel',
+			'.tableviewer-modal-overlay'
+		];
+
+		$('body').on('click', closeSelectors.join(','), function(e) {
+			that._hideModal();
+		});
+
+		// Put element into NetworkTables
+		this.modal.$okButton.on('click', function(e) {
+			var type = that.modal.$body.attr('data-type');
+			var key = that.modal.$parentPath.val() + that.modal.$key.val();
+			var value;
+
+			if(type === 'string') {
+				value = that.modal.$addStringInput.val();
+			} else if(type ==='number') {
+				value = parseFloat(that.modal.$addNumberInput.val());
+			} else if(type === 'boolean') {
+				value = that.modal.$addBooleanInput.prop('checked');
+			}
+
+			NetworkTables.putValue(key, value);
+
+			that._hideModal();
+		});
+
+	};
+
+	Tableviewer.prototype._showModal = function(parentPath, type) {
+
+		type = ['string', 'number', 'boolean', 'array'].indexOf(type) > -1 ? type : 'string';
+
+		this.modal.$parentPath.val(parentPath ? parentPath : '');
+		this.modal.$key.val('');
+		this.modal.$body.attr('data-type', type);
+		this.modal.$typeLabel.text(type);
+
+		this.modal.$el.css('display', 'block');
+		this.modal.$overlay.css('display', 'block');
+	};
+
+	Tableviewer.prototype._hideModal = function() {
+		this.modal.$el.css('display', 'none');
+		this.modal.$overlay.css('display', 'none');
+	};
 
 	Tableviewer.prototype.printTable = function() {
 		console.log(this.ntRoot);
