@@ -23,10 +23,11 @@
 		// Expand/Collabse tables
 		$el.on('click', '.expanded, .collapsed', function(e) {
 			$(this).toggleClass('expanded collapsed');
+			$(this).siblings().find('input[type=number], input[type=text]').trigger('tableExpanded');
 		});
 
 		// Resize number input based on length of input
-		$el.on('change keyup ntUpdate', '[type=number]', function(e) {
+		$el.on('change keyup ntUpdate tableExpanded', '[type=number]', function(e) {
 			var text = $(this).val();
 			var length = text.length;
 			var $phantomInput = $(this).next();
@@ -34,7 +35,7 @@
 			$(this).css('max-width', 13 + $phantomInput.width());
 		});
 
-		$el.on('change keyup ntUpdate', '[type=text]', function(e) {
+		$el.on('change keyup ntUpdate tableExpanded', '[type=text]', function(e) {
 			var text = $(this).val();
 			var length = text.length;
 			var $phantomInput = $(this).next();
