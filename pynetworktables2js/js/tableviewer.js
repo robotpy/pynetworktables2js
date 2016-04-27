@@ -9,10 +9,12 @@
 
 	function Tableviewer($el) {
 		this.$el = $el.addClass('tableviewer');
+		var $root = $('<div class="table" data-path=""><button class="expanded"></button>Root<ul style="margin: 0"></ul></div>')
+			.appendTo($el);
 		this.ntRoot = {
 			'' : {
 				type : 'table',
-				$el : $('<ul>Root</ul>').appendTo($el)
+				$el : $root.find('ul')
 			}
 		};
 
@@ -89,7 +91,7 @@
 
 		var key = '';
 
-		this.$el.on('contextmenu', 'li.table, li.table > *', function(e) {
+		this.$el.on('contextmenu', '.table, .table > *', function(e) {
 			var $target = $(e.target);
 			var $table = $target.hasClass('table') ? $target : $target.parent();
 			if($table.hasClass('table')) {
