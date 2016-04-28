@@ -469,7 +469,7 @@
 	// jQuery plugin
 	$.fn.extend({
 		tableviewer:  function() {
-			var args = [...arguments];
+			var args = Array.prototype.slice.call(arguments);
 			var method = args.shift();
 			var methodArgs = args;
 
