@@ -337,13 +337,16 @@
 
 		if(!this.ntRoot[path]) {
 			// Otherwise the path doesn't exist so add
-			var $el = $('<li class="table" data-path="' + path + '"><button class="collapsed"></button>' + step + '<ul></ul></li>')
-				.appendTo(this.ntRoot[parentPath].$el);
+			var $el = $('<li class="table" data-path="' + path + '"><button class="collapsed"></button>' + step + '<ul></ul></li>');
 			
 			this.ntRoot[path] = {
 				type : 'table',
 				$el : $el.find('ul'),
+				$root : $el,
+				parentPath : parentPath
 			}
+
+			this._addNodeToDom(path);
 		}
 
 		return true;
@@ -357,14 +360,17 @@
 						step + 
 						'<span class="type">Array[' + value.length + ']</span>' +
 						'<ul></ul>' +
-					'</li>')
-			.appendTo(this.ntRoot[parentPath].$el);
+					'</li>');
 
 		this.ntRoot[path] = {
 			type : 'array',
 			$el : $el.find('ul'),
-			$type : $el.find('.type')
+			$root : $el,
+			$type : $el.find('.type'),
+			parentPath : parentPath
 		};
+
+		this._addNodeToDom(path);
 	};
 
 	Tableviewer.prototype._createBooleanNode = function(parentPath, step, value) {
@@ -372,16 +378,19 @@
 		var $el = $('<li class="boolean" data-path="' + path + '"></li>')
 			.append('<span class="key">' + step + '</span>')
 			.append('<input type="checkbox" class="value"/>')
-			.append('<span class="type">boolean</span>')
-			.appendTo(this.ntRoot[parentPath].$el);
+			.append('<span class="type">boolean</span>');
 
 		this.ntRoot[path] = {
 			type : 'boolean',
 			$el : $el,
+			$root : $el,
 			$key : $el.find('.key'),
 			$value : $el.find('.value'),
-			$type : $el.find('.type')
+			$type : $el.find('.type'),
+			parentPath : parentPath
 		};
+
+		this._addNodeToDom(path);
 	};
 
 	Tableviewer.prototype._createNumberNode = function(parentPath, step, value) {
@@ -390,17 +399,20 @@
 			.append('<span class="key">' + step + '</span>')
 			.append('<input type="number" step="any" class="value"/>')
 			.append('<span class="phantom-input"></span>')
-			.append('<span class="type">number</span>')
-			.appendTo(this.ntRoot[parentPath].$el);
+			.append('<span class="type">number</span>');
 
 		this.ntRoot[path] = {
 			type : 'number',
 			$el : $el,
+			$root: $el,
 			$key : $el.find('.key'),
 			$value : $el.find('.value'),
 			$phantomInput : $el.find('.phantom-input'),
-			$type : $el.find('.type')
+			$type : $el.find('.type'),
+			parentPath : parentPath
 		};
+
+		this._addNodeToDom(path);
 	};
 
 	Tableviewer.prototype._createStringNode = function(parentPath, step, value) {
@@ -409,19 +421,50 @@
 			.append('<span class="key">' + step + '</span>')
 			.append('&ldquo;<input type="text" class="value"/>&rdquo;')
 			.append('<span class="phantom-input"></span>')
-			.append('<span class="type">string</span>')
-			.appendTo(this.ntRoot[parentPath].$el);
+			.append('<span class="type">string</span>');
 
 		this.ntRoot[path] = {
 			type : 'string',
 			$el : $el,
+			$root : $el,
 			$key : $el.find('.key'),
 			$value : $el.find('.value'),
 			$phantomInput : $el.find('.phantom-input'),
-			$type : $el.find('.type')
+			$type : $el.find('.type'),
+			parentPath : parentPath
 		};
+
+		this._addNodeToDom(path);
 	};
 
+	Tableviewer.prototype._getChildPaths = function(parentPath) {
+		var childPaths = [];
+		for(var path in this.ntRoot) {
+			if(this.ntRoot[path].parentPath === parentPath) {
+				childPaths.push(path);
+			}
+		}
+		return childPaths.sort();
+	};
+
+	Tableviewer.prototype._getSiblingPaths = function(path) {
+		return this._getChildPaths(this.ntRoot[path].parentPath);
+	};
+
+	Tableviewer.prototype._addNodeToDom = function(path) {
+		var siblingPaths = this._getSiblingPaths(path);
+		var nodeIndex = siblingPaths.indexOf(path);
+		var $el = this.ntRoot[path].$root;
+		var parentPath = this.ntRoot[path].parentPath;
+		//console.log(siblingPaths);
+		if(nodeIndex <= 0) {
+			$el.prependTo(this.ntRoot[parentPath].$el);
+		} else {
+			var beforePath = siblingPaths[nodeIndex - 1];
+			var $before = this.ntRoot[beforePath].$root;
+			$before.after($el);
+		}
+	};
 
 	// jQuery plugin
 	$.fn.extend({
