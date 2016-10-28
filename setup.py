@@ -42,7 +42,7 @@ with open(join(setup_dir, 'README.rst'), 'r') as readme_file:
 setup(
     name='pynetworktables2js',
     version=__version__,
-    description='RobotPy web-based low fidelity FRC robot simulation package',
+    description='Forwards NetworkTables traffic to a web page via a Websocket',
     long_description=long_description,
     author='RobotPy Development Team',
     author_email='robotpy@googlegroups.com',
@@ -53,7 +53,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'tornado>=4.0',
-        'pynetworktables>=2015.3.2'
+        'pynetworktables>=2017.0.0a1'
     ],
     entry_points={'console_scripts': [ 'pynetworktables2js = pynetworktables2js.__main__:main' ]},
     license="BSD License",

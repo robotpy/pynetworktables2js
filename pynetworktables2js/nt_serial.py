@@ -20,14 +20,7 @@ class NTSerial(object):
         self.update_callback = update_callback
         self.nt = NetworkTable.getGlobalTable()
         NetworkTable.addGlobalListener(self._nt_on_change, immediateNotify=True)
-
-        class Empty:
-            pass
-        self.conn_listener = Empty()
-        self.conn_listener.connected = self._nt_connected
-        self.conn_listener.disconnected = self._nt_disconnected
-
-        self.nt.addConnectionListener(self.conn_listener, immediateNotify=True)
+        self.nt.addConnectionListener(self._nt_connected, immediateNotify=True)
 
     def process_update(self, update):
         """Process an incoming update from a remote NetworkTables"""
@@ -45,11 +38,9 @@ class NTSerial(object):
         self._send_update({'k': key, 'v': value, 'n': isNew})
 
     # NetworkTables connection listener callbacks
-    def _nt_connected(self, table):
-        self._send_update({'r': True, 'a': self.nt.getRemoteAddress()})
+    def _nt_connected(self, connected, info):
+        self._send_update({'r': connected, 'a': self.nt.getRemoteAddress()})
 
-    def _nt_disconnected(self, table):
-        self._send_update({'r': False, 'a': None})
 
     def close(self):
         """

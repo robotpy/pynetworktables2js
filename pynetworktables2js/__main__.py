@@ -18,8 +18,13 @@ from optparse import OptionParser
 import tornado.web
 from tornado.ioloop import IOLoop
 
-from networktables import NetworkTable
+from networktables import NetworkTables
 from . import get_handlers, NonCachingStaticFileHandler
+
+try:
+    from .version import __version__
+except ImportError:
+    __version__ = '__master__'
 
 import logging
 logger = logging.getLogger('dashboard')
@@ -31,13 +36,14 @@ def init_networktables(options):
 
     if options.dashboard:
         logger.info("Connecting to networktables in Dashboard mode")
-        NetworkTable.setDashboardMode()
+        NetworkTables.setDashboardMode()
     else:
         logger.info("Connecting to networktables at %s", options.robot)
-        NetworkTable.setIPAddress(options.robot)
-        NetworkTable.setClientMode()
+        NetworkTables.setIPAddress(options.robot)
+        NetworkTables.setClientMode()
     
-    NetworkTable.initialize()
+    NetworkTables.setNetworkIdentity(options.identity)
+    NetworkTables.initialize()
     logger.info("Networktables Initialized")
 
 
@@ -57,6 +63,9 @@ def main():
     
     parser.add_option('--dashboard', default=False, action='store_true',
                       help='Use this instead of --robot to receive the IP from the driver station. WARNING: It will not work if you are not on the same host as the DS!')
+        
+    parser.add_option('--identity', default='pynetworktables2js %s' % __version__, 
+                      help='Identity to broadcast to remote NT clients')
         
     options, args = parser.parse_args()
     
