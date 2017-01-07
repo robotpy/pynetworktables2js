@@ -47,4 +47,4 @@ class NTSerial(object):
         Clean up NetworkTables listeners
         """
         NetworkTable.removeGlobalListener(self._nt_on_change)
-        self.nt.removeConnectionListener(self.conn_listener)
+        self.nt.removeConnectionListener(self._nt_connected)
