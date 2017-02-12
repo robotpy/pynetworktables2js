@@ -23,6 +23,20 @@ Documentation can be found at http://pynetworktables2js.readthedocs.org/
 Installation
 ============
 
+Easy install (Windows only)
+---------------------------
+
+1. Download the latest pynetworktables2js.exe from github at
+   https://github.com/robotpy/pynetworktables2js/releases .
+2. Copy the 
+
+.. note:: By default, it will connect to 127.0.0.1. To connect to a robot,
+          you will need to pass the exe arguments to tell it where the robot is.
+          Use --help to see the available options.
+
+Manual install
+--------------
+
 Make sure to install python 2 or 3 on your computer, and on Windows you can
 execute::
 
@@ -56,13 +70,6 @@ those resources to make something cool to control your robot?
 Usage
 =====
 
-There are two example servers distributed with pynetworktables2js, one that
-uses `tornado <http://www.tornadoweb.org/en/stable/>`_, and one that uses
-`aiohttp <https://github.com/KeepSafe/aiohttp>`_. Either one should work.
-
-No-copy server
---------------
-
 You can just distribute your HTML files, and run a pynetworktables server
 using the following command from inside the directory::
 
@@ -79,6 +86,10 @@ browser (I recommend Chrome) to http://127.0.0.1:8888 and see your website.
 
 Customized python server
 ------------------------
+
+There are two example servers distributed with pynetworktables2js, one that
+uses `tornado <http://www.tornadoweb.org/en/stable/>`_, and one that uses
+`aiohttp <https://github.com/KeepSafe/aiohttp>`_. Either one should work.
 
 Go to the 'example' directory distributed with pynetworktables2js, and run::
 

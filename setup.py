@@ -39,6 +39,9 @@ else:
 with open(join(setup_dir, 'README.rst'), 'r') as readme_file:
     long_description = readme_file.read()
 
+with open(join(setup_dir, 'requirements.txt')) as fp:
+    install_requires = fp.readlines()
+
 setup(
     name='pynetworktables2js',
     version=__version__,
@@ -51,10 +54,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=[
-        'tornado>=4.0',
-        'pynetworktables>=2017.0.0a1'
-    ],
+    install_requires=install_requires,
     entry_points={'console_scripts': [ 'pynetworktables2js = pynetworktables2js.__main__:main' ]},
     license="BSD License",
     classifiers=[
