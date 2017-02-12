@@ -5,3 +5,5 @@
 
 cd $(dirname $0)
 docker run --rm -v "$(pwd):/src:Z" -e PYTHONPATH=/src cdrx/pyinstaller-windows:python2
+
+zip dist/pynetworktables2js-$(git describe --tags).zip dist/windows/pynetworktables2js.exe
