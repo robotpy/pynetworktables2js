@@ -61,8 +61,8 @@ def main():
     parser.add_option('--robot', default='127.0.0.1', 
                       help="Robot's IP address")
     
-    parser.add_option('--dashboard', default=False, action='store_true',
-                      help='Use this instead of --robot to receive the IP from the driver station. WARNING: It will not work if you are not on the same host as the DS!')
+    #parser.add_option('--dashboard', default=False, action='store_true',
+    #                  help='Use this instead of --robot to receive the IP from the driver station. WARNING: It will not work if you are not on the same host as the DS!')
         
     parser.add_option('--identity', default='pynetworktables2js %s' % __version__, 
                       help='Identity to broadcast to remote NT clients')
@@ -74,8 +74,8 @@ def main():
                         format=log_format,
                         level=logging.DEBUG if options.verbose else logging.INFO)
     
-    if options.dashboard and options.robot != '127.0.0.1':
-        parser.error("Cannot specify --robot and --dashboard")
+    #if options.dashboard and options.robot != '127.0.0.1':
+    #    parser.error("Cannot specify --robot and --dashboard")
     
     # Setup NetworkTables
     init_networktables(options)
