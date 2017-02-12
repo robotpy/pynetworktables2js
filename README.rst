@@ -28,7 +28,9 @@ Easy install (Windows only)
 
 1. Download the latest pynetworktables2js.exe from github at
    https://github.com/robotpy/pynetworktables2js/releases .
-2. Copy the 
+2. Extract the exe from the zipfile, and copy it to your directory of HTML/JS
+   files.
+3. Double click the exe to run it!
 
 .. note:: By default, it will connect to 127.0.0.1. To connect to a robot,
           you will need to pass the exe arguments to tell it where the robot is.
