@@ -34,13 +34,13 @@ log_format = "%(asctime)s:%(msecs)03d %(levelname)-8s: %(name)-20s: %(message)s"
 
 def init_networktables(options):
 
-    if options.dashboard:
-        logger.info("Connecting to networktables in Dashboard mode")
-        NetworkTables.setDashboardMode()
-    else:
-        logger.info("Connecting to networktables at %s", options.robot)
-        NetworkTables.setIPAddress(options.robot)
-        NetworkTables.setClientMode()
+    #if options.dashboard:
+    #    logger.info("Connecting to networktables in Dashboard mode")
+    #    NetworkTables.setDashboardMode()
+    #else:
+    logger.info("Connecting to networktables at %s", options.robot)
+    NetworkTables.setIPAddress(options.robot)
+    NetworkTables.setClientMode()
     
     NetworkTables.setNetworkIdentity(options.identity)
     NetworkTables.initialize()
