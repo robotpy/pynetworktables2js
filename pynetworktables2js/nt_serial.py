@@ -2,7 +2,8 @@ try:
     import ujson as json
 except ImportError:
     import json
-from networktables import NetworkTable
+    
+from networktables import NetworkTables
 
 __all__ = ["NTSerial"]
 
@@ -18,8 +19,8 @@ class NTSerial(object):
         formatted as strings.
         """
         self.update_callback = update_callback
-        self.nt = NetworkTable.getGlobalTable()
-        NetworkTable.addGlobalListener(self._nt_on_change, immediateNotify=True)
+        self.nt = NetworkTables.getGlobalTable()
+        NetworkTables.addGlobalListener(self._nt_on_change, immediateNotify=True)
         self.nt.addConnectionListener(self._nt_connected, immediateNotify=True)
 
     def process_update(self, update):
@@ -46,5 +47,5 @@ class NTSerial(object):
         """
         Clean up NetworkTables listeners
         """
-        NetworkTable.removeGlobalListener(self._nt_on_change)
+        NetworkTables.removeGlobalListener(self._nt_on_change)
         self.nt.removeConnectionListener(self._nt_connected)

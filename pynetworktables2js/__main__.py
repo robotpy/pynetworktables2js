@@ -39,11 +39,8 @@ def init_networktables(options):
     #    NetworkTables.setDashboardMode()
     #else:
     logger.info("Connecting to networktables at %s", options.robot)
-    NetworkTables.setIPAddress(options.robot)
-    NetworkTables.setClientMode()
-    
     NetworkTables.setNetworkIdentity(options.identity)
-    NetworkTables.initialize()
+    NetworkTables.initialize(server=options.robot)
     logger.info("Networktables Initialized")
 
 
