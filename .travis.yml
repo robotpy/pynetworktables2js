@@ -1,0 +1,29 @@
+---
+services:
+- docker
+
+script:
+- ./build_exe.sh
+
+deploy:
+- provider: pypi
+  user: $PYPI_USERNAME
+  password: $PYPI_PASSWORD
+  on:
+    tags: true
+
+- provider: releases
+  api_key: $GITHUB_OAUTH_TOKEN
+  file_glob: true
+  file: dist/pynetworktables2js*.zip
+  skip_cleanup: true
+  on:
+    tags: true
+
+notifications:
+  webhooks:
+    urls:
+    - https://webhooks.gitter.im/e/2fb1c026e64fdd70d27b
+    on_success: change
+    on_failure: always
+    on_start: never
