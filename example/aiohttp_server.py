@@ -14,7 +14,7 @@ from optparse import OptionParser
 import asyncio
 from aiohttp import web
 
-from networktables import NetworkTable
+from networktables import NetworkTables
 from pynetworktables2js import nt2js_static_resources, networktables_websocket
 
 import logging
@@ -25,15 +25,17 @@ log_format = "%(asctime)s:%(msecs)03d %(levelname)-8s: %(name)-20s: %(message)s"
 
 def init_networktables(options):
 
-    if options.dashboard:
-        logger.info("Connecting to networktables in Dashboard mode")
-        NetworkTable.setDashboardMode()
+    if options.team:
+        logger.info("Connecting to NetworkTables for team %s", options.team)
+        NetworkTables.startClientTeam(options.team)
     else:
         logger.info("Connecting to networktables at %s", options.robot)
-        NetworkTable.setIPAddress(options.robot)
-        NetworkTable.setClientMode()
+        NetworkTables.initialize(server=options.robot)
+
+    if options.dashboard:
+        logger.info("Enabling driver station override mode")
+        NetworkTables.startDSClient()
     
-    NetworkTable.initialize()
     logger.info("Networktables Initialized")
 
 @asyncio.coroutine
@@ -45,7 +47,7 @@ if __name__ == '__main__':
     # Setup options here
     parser = OptionParser()
 
-    parser.add_option('-p', '--port', default=8888,
+    parser.add_option('-p', '--port', type=int, default=8888,
                       help='Port to run web server on')
 
     parser.add_option('-v', '--verbose', default=False, action='store_true',
@@ -53,6 +55,8 @@ if __name__ == '__main__':
 
     parser.add_option('--robot', default='127.0.0.1',
                       help="Robot's IP address")
+
+    parser.add_option('--team', type=int, help='Team number of robot to connect to')
 
     parser.add_option('--dashboard', default=False, action='store_true',
                       help='Use this instead of --robot to receive the IP from the driver station. WARNING: It will not work if you are not on the same host as the DS!')
@@ -64,8 +68,8 @@ if __name__ == '__main__':
                         format=log_format,
                         level=logging.DEBUG if options.verbose else logging.INFO)
     
-    if options.dashboard and options.robot != '127.0.0.1':
-        parser.error("Cannot specify --robot and --dashboard")
+    if options.team and options.robot != '127.0.0.1':
+        parser.error("--robot and --team are mutually exclusive")
     
     # Setup NetworkTables
     init_networktables(options)
@@ -94,4 +98,3 @@ if __name__ == '__main__':
         loop.run_forever()
     except KeyboardInterrupt:
         pass
-

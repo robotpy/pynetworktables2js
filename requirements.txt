@@ -1,2 +1,2 @@
 tornado>=4.0
-pynetworktables>=2018.0.0
+pynetworktables>=2018.0.1
