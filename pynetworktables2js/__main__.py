@@ -32,15 +32,21 @@ logger = logging.getLogger('dashboard')
 log_datefmt = "%H:%M:%S"
 log_format = "%(asctime)s:%(msecs)03d %(levelname)-8s: %(name)-20s: %(message)s"
 
+
 def init_networktables(options):
+    NetworkTables.setNetworkIdentity(options.identity)
+
+    if options.team:
+        logger.info("Connecting to NetworkTables for team %s", options.team)
+        NetworkTables.startClientTeam(options.team)
+    else:
+        logger.info("Connecting to NetworkTables at %s", options.robot)
+        NetworkTables.initialize(server=options.robot)
 
     #if options.dashboard:
     #    logger.info("Connecting to networktables in Dashboard mode")
     #    NetworkTables.setDashboardMode()
-    #else:
-    logger.info("Connecting to networktables at %s", options.robot)
-    NetworkTables.setNetworkIdentity(options.identity)
-    NetworkTables.initialize(server=options.robot)
+
     logger.info("Networktables Initialized")
 
 
@@ -49,7 +55,7 @@ def main():
     # Setup options here
     parser = OptionParser()
     
-    parser.add_option('-p', '--port', default=8888, 
+    parser.add_option('-p', '--port', type='int', default=8888,
                       help='Port to run web server on')
     
     parser.add_option('-v', '--verbose', default=False, action='store_true', 
@@ -57,6 +63,8 @@ def main():
     
     parser.add_option('--robot', default='127.0.0.1', 
                       help="Robot's IP address")
+
+    parser.add_option('--team', type='int', help='Team number of robot to connect to')
     
     #parser.add_option('--dashboard', default=False, action='store_true',
     #                  help='Use this instead of --robot to receive the IP from the driver station. WARNING: It will not work if you are not on the same host as the DS!')
@@ -71,8 +79,8 @@ def main():
                         format=log_format,
                         level=logging.DEBUG if options.verbose else logging.INFO)
     
-    #if options.dashboard and options.robot != '127.0.0.1':
-    #    parser.error("Cannot specify --robot and --dashboard")
+    if options.team and options.robot != '127.0.0.1':
+        parser.error("--robot and --team are mutually exclusive")
     
     # Setup NetworkTables
     init_networktables(options)
