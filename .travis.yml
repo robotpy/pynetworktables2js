@@ -3,7 +3,11 @@ language: python
 services:
 - docker
 
+install:
+- pip install sphinx sphinx-rtd-theme
+
 script:
+- make -C docs html
 - ./build_exe.sh
 
 deploy:
