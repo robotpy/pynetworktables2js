@@ -85,6 +85,13 @@ This will start a pynetworktables2js server using Tornado (which is installed
 by default) and it will serve the current directory. You can navigate your
 browser (I recommend Chrome) to http://127.0.0.1:8888 and see your website.
 
+You will want to also pass either the ``--robot`` or ``--team`` switch::
+
+    py -m pynetworktables2js --robot roborio-XXXX-frc.local
+    py -m pynetworktables2js --team XXXX
+
+Dashboard mode currently doesn't work, as the underlying support in
+pynetworktables hasn't been implemented yet for the newer FRC Driver Station.
 
 Customized python server
 ------------------------
