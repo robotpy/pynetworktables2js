@@ -1,13 +1,13 @@
 pynetworktables2js
 ==================
 
-A cross platform library that forwards NetworkTables key/values over a Websocket,
+A cross platform library that forwards NetworkTables key/values over a WebSocket,
 so that you can easily write a Driver Station Dashboard for your robot in HTML5 +
 JavaScript.
 
 This library does not provide a full dashboard solution, but is intended to
 provide the necessary plumbing for one to create one with only knowledge
-of HTML/Javascript. Because the communications layer uses NetworkTables, you
+of HTML/JavaScript. Because the communications layer uses NetworkTables, you
 can connect to all FRC languages (C++, Java, LabVIEW, Python).
 
 .. note:: NetworkTables is a protocol used for robot communication in the
@@ -26,7 +26,7 @@ Installation
 Easy install (Windows only)
 ---------------------------
 
-1. Download the latest pynetworktables2js.exe from github at
+1. Download the latest pynetworktables2js.exe from GitHub at
    https://github.com/robotpy/pynetworktables2js/releases .
 2. Extract the exe from the zipfile, and copy it to your directory of HTML/JS
    files.
@@ -34,7 +34,7 @@ Easy install (Windows only)
 
 .. note:: By default, it will connect to 127.0.0.1. To connect to a robot,
           you will need to pass the exe arguments to tell it where the robot is.
-          Use --help to see the available options.
+          Use ``--help`` to see the available options.
 
 Manual install
 --------------
@@ -76,15 +76,22 @@ You can just distribute your HTML files, and run a pynetworktables server
 using the following command from inside the directory::
 
     python -m pynetworktables2js
-	
+
 Or on Windows::
 
     py -m pynetworktables2js
-    
+
 This will start a pynetworktables2js server using Tornado (which is installed
 by default) and it will serve the current directory. You can navigate your
 browser (I recommend Chrome) to http://127.0.0.1:8888 and see your website.
 
+You will want to also pass either the ``--robot`` or ``--team`` switch::
+
+    py -m pynetworktables2js --robot roborio-XXXX-frc.local
+    py -m pynetworktables2js --team XXXX
+
+Dashboard mode currently doesn't work, as the underlying support in
+pynetworktables hasn't been implemented yet for the newer FRC Driver Station.
 
 Customized python server
 ------------------------
@@ -103,9 +110,9 @@ If you want to try this out with your current robot, you can do::
     
 If you are running pynetworktables2js on your driver station laptop, you can
 receive robot IP information directly from the Driver Station (handy during
-actual competitions):
+actual competitions)::
 
-	python tornado_server.py --dashboard
+    python tornado_server.py --dashboard
 
 If you navigate your browser (I recommend Chrome) to http://127.0.0.1:8888, all
 of the current NetworkTables values will be shown as they change.
@@ -120,18 +127,19 @@ dashboard. Just add your custom files to the www directory.
 Contributing new changes
 ========================
 
-pynetworktables2js is intended to be a project that all members of the FIRST
+pynetworktables2js is intended to be a project that all members of the `FIRST`
 community can quickly and easily contribute to. If you find a bug, or have an
 idea that you think others can use:
 
-1. `Fork this git repository <https://github.com/robotpy/pynetworktables2js/fork>`_ to your github account
+1. `Fork this git repository <https://github.com/robotpy/pynetworktables2js/fork>`_
+   to your GitHub account
 2. Create your feature branch (``git checkout -b my-new-feature``)
 3. Commit your changes (``git commit -am 'Add some feature'``)
 4. Push to the branch (``git push -u origin my-new-feature``)
-5. Create new Pull Request on github
+5. Create new Pull Request on GitHub
 
 One place in particular I would love to see contributions is in adding useful
-javascript functions/objects that make creating dashboards even easier!
+JavaScript functions/objects that make creating dashboards even easier!
 
 Authors
 =======
