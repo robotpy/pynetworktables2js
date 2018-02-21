@@ -19,14 +19,13 @@ class NTSerial(object):
         formatted as strings.
         """
         self.update_callback = update_callback
-        self.nt = NetworkTables.getGlobalTable()
         NetworkTables.addGlobalListener(self._nt_on_change, immediateNotify=True)
         NetworkTables.addConnectionListener(self._nt_connected, immediateNotify=True)
 
     def process_update(self, update):
         """Process an incoming update from a remote NetworkTables"""
         data = json.loads(update)
-        self.nt.putValue(data['k'], data['v'])
+        NetworkTables.putValue(data['k'], data['v'])
 
     def _send_update(self, data):
         """Send a NetworkTables update via the stored send_update callback"""
