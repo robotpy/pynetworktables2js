@@ -43,9 +43,9 @@ def init_networktables(options):
         logger.info("Connecting to NetworkTables at %s", options.robot)
         NetworkTables.initialize(server=options.robot)
 
-    #if options.dashboard:
-    #    logger.info("Connecting to networktables in Dashboard mode")
-    #    NetworkTables.setDashboardMode()
+    if options.dashboard:
+        logger.info("Connecting to networktables in Dashboard mode")
+        NetworkTables.setDashboardMode()
 
     logger.info("Networktables Initialized")
 
@@ -66,8 +66,8 @@ def main():
 
     parser.add_option('--team', type='int', help='Team number of robot to connect to')
     
-    #parser.add_option('--dashboard', default=False, action='store_true',
-    #                  help='Use this instead of --robot to receive the IP from the driver station. WARNING: It will not work if you are not on the same host as the DS!')
+    parser.add_option('--dashboard', default=False, action='store_true',
+                      help='Use this instead of --robot to receive the IP from the driver station. WARNING: It will not work if you are not on the same host as the DS!')
         
     parser.add_option('--identity', default='pynetworktables2js %s' % __version__, 
                       help='Identity to broadcast to remote NT clients')
