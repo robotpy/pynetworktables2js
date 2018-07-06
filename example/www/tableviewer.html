@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="/networktables/css/tableviewer.css"/>
+</head>
+<body>
+
+<div id="tableviewer"></div>
+
+<!-- This starts the NetworkTables websocket, it can be accessed from multiple
+     pages simultaneously -->
+<script src="/networktables/networktables.js"></script>
+
+<!-- Obviously, you will want to copy this file locally in a real 
+     dashboard, as the Driver Station won't have internet access -->
+<script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+
+<script src="/networktables/tableviewer.js"></script>
+
+
+<script type="text/javascript">
+"use strict";
+
+var $tableviewer = $('#tableviewer').tableviewer();
+
+</script>
+
+</body>
+</html>

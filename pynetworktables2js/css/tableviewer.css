@@ -1,0 +1,212 @@
+
+.tableviewer {
+	position: relative;
+}
+
+.tableviewer ul, .tableviewer li {
+	list-style: none;
+}
+
+.tableviewer ul {
+	padding-left: 0;
+}
+
+.tableviewer li.boolean, .tableviewer li.number, .tableviewer li.string {
+	padding-left: 25px;
+}
+
+.tableviewer li.table, .tableviewer li.array {
+	padding-left: 19px;
+}
+
+.tableviewer > ul {
+	padding-left: 0;
+}
+
+.tableviewer button.expanded, .tableviewer button.collapsed {
+	background: none;
+    border: none;
+    outline: none;
+}
+
+.tableviewer button.expanded::before {
+	content: "▼";
+}
+
+.tableviewer button.collapsed::before {
+	content: "▶";
+}
+
+.tableviewer button.collapsed + ul, .tableviewer button.collapsed + span + ul {
+	display: none;
+}
+
+
+.tableviewer .key::after {
+	content: ":";
+	display: inline-block;
+	padding: 0 10px;
+}
+
+.tableviewer span.type {
+	text-transform: capitalize;
+	color: #aaa;
+	font-size: x-small;
+	margin-left: 13px;
+	display: inline-block;
+    bottom: 2px;
+    position: relative;
+}
+
+.tableviewer .number span.type {
+	margin-left: 0;
+}
+
+
+.tableviewer input[type=number] {
+	position: relative;
+	border: none;
+	outline: none;
+	padding-left: 10px;
+	width: 100%;
+	text-overflow: ellipsis;
+}
+
+.tableviewer li.string, .tableviewer li.number {
+	display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.tableviewer li.string .key, .tableviewer li.number .key {
+	display: flex;
+}
+
+.tableviewer input[type="number"]::-webkit-outer-spin-button, 
+.tableviewer input[type="number"]::-webkit-inner-spin-button {
+	position: absolute;
+	left: -5px;
+}
+
+
+.tableviewer input[type=text] {
+	width: 100%;
+	border: none;
+	outline: none;
+	text-overflow: ellipsis;
+	margin: 0 3px;
+}
+
+.tableviewer .phantom-input {
+	position: absolute;
+	visibility: hidden;
+	-webkit-user-select: none;
+}
+
+.tableviewer input, .tableviewer .phantom-input {
+	font-family: "Times New Roman", Times, serif;
+	font-size: 12px;
+}
+
+.tableviewer .array ul .type {
+	display: none;
+}
+
+
+
+.tableviewer-modal {
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 100px;
+	width: 300px;
+	z-index: 200;
+	background-color: white;
+	border: 2px solid #aaa;
+	margin: 0 auto;
+	padding: 10px;
+}
+
+.tableviewer-modal .close {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 7px;
+	cursor: pointer;
+	line-height: 8px;
+}
+
+.tableviewer-modal .title {
+	font-weight: bold;
+    margin-bottom: 12px;
+    font-size: larger;
+}
+
+.tableviewer-modal .input-row {
+	display: flex;
+	margin-bottom: 8px;
+}
+
+.tableviewer-modal .input-row label {
+	display: inline-block;
+	margin-right: 8px;
+}
+
+.tableviewer-modal .input-row input {
+	flex: 1;
+}
+
+.tableviewer-modal-overlay {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255,255,255,.8);
+	left: 0;
+	right: 0;
+	top: 0;
+	z-index: 100;
+}
+
+.tableviewer-modal .buttons {
+	text-align: right;
+}
+
+.tableviewer-modal .buttons button {
+	text-transform: uppercase;
+    padding: 5px 10px;
+    margin: 0 3px;
+}
+
+.tableviewer-modal .body:not([data-type=string]) .add-string {
+	display: none;
+}
+
+.tableviewer-modal .body:not([data-type=number]) .add-number {
+	display: none;
+}
+
+.tableviewer-modal .body:not([data-type=boolean]) .add-boolean {
+	display: none;
+}
+
+.tableviewer-modal .title .type-label {
+	text-transform: capitalize;
+}
+
+.tableviewer .contextmenu {
+	position: absolute;
+	border: 1px solid black;
+}
+
+.tableviewer .contextmenu span {
+	display: block;
+	width: 120px;
+	padding: 5px 10px;
+	text-align: left;
+	background: white;
+	cursor: pointer;
+}
+
+.tableviewer .contextmenu span:hover {
+	background: #aaa;
+}
