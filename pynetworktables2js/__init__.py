@@ -1,5 +1,6 @@
 import logging
-logger = logging.getLogger('net2js')
+
+logger = logging.getLogger("net2js")
 
 try:
     import tornado
@@ -7,7 +8,11 @@ except ImportError as e:
     logger.info(e)
     logger.info("Could not import tornado, disabling support.")
 else:
-    from .tornado_handlers import NetworkTablesWebSocket, NonCachingStaticFileHandler, get_handlers
+    from .tornado_handlers import (
+        NetworkTablesWebSocket,
+        NonCachingStaticFileHandler,
+        get_handlers,
+    )
 
 try:
     import aiohttp
@@ -20,4 +25,4 @@ else:
 try:
     from .version import __version__
 except ImportError:
-    __version__ = '__master__'
+    __version__ = "__master__"

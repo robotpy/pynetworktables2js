@@ -5,16 +5,17 @@ from aiohttp import web
 from os.path import abspath, dirname, join
 from .nt_serial import NTSerial
 
-logger = logging.getLogger('net2js')
+logger = logging.getLogger("net2js")
 
-__all__ = ['nt2js_static_resources', 'networktables_websocket']
+__all__ = ["nt2js_static_resources", "networktables_websocket"]
 
 
 def nt2js_static_resources():
     """
     Returns the absolute filesystem path for the nt2js static resources.
     """
-    return abspath(join(dirname(__file__), 'js'))
+    return abspath(join(dirname(__file__), "js"))
+
 
 @asyncio.coroutine
 def networktables_websocket(request):
@@ -23,6 +24,7 @@ def networktables_websocket(request):
     ws.start(request)
 
     event_loop = asyncio.get_event_loop()
+
     def send_message(msg):
         # Schedule msg to be sent from the event loop's thread
         event_loop.call_soon_threadsafe(partial(ws.send_str, msg))
