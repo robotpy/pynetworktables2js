@@ -294,7 +294,17 @@ var NetworkTables = new function () {
 		host = "ws:";
 	}
 	
-	host += "//" + loc.host;
+	// If the websocket is being served from a different host allow users 
+	// to add a data-nt-host="" attribute to the script tag loading 
+	// Networktables.
+	var ntHostElement = document.querySelector('[data-nt-host]');
+	if (ntHostElement) {
+		var ntHost = ntHostElement.getAttribute('data-nt-host');
+		host += "//" + ntHost;
+	} else {
+		host += "//" + loc.host;
+	}
+
 	host += "/networktables/ws";
 	
 	function createSocket() {

@@ -26,6 +26,10 @@ class NetworkTablesWebSocket(WebSocketHandler):
         self.ioloop = IOLoop.current()
         self.ntserial = NTSerial(self.send_msg_threadsafe)
 
+    def check_origin(self, origin):
+        '''Allow CORS requests'''
+        return True
+
     def on_message(self, message):
         if self.ntserial is not None:
             self.ntserial.process_update(message)
