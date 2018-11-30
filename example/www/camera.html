@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+</head>
+<body>
+
+<!-- This starts the NetworkTables websocket, it can be accessed from multiple
+     pages simultaneously -->
+<script src="/networktables/networktables.js"></script>
+
+<!-- Obviously, you will want to copy this file locally in a real 
+     dashboard, as the Driver Station won't have internet access -->
+<script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+
+<!-- utility functions to attach to a camera -->
+<script src="/networktables/camera.js"></script>
+
+<div>
+  Robot: <span id="robotstate">Unknown state</span> @ <span id="robotAddress">disconnected</span>
+</div>
+
+Camera:
+
+<div id="camera_container", style="height: 500px; width: 500px;">
+    <!-- this element should be empty, an img tag will be added here -->
+</div>
+
+<script type="text/javascript">
+"use strict";
+
+function onRobotConnection(connected) {
+	$('#robotstate').text(connected ? "Connected!" : "Disconnected");
+	$('#robotAddress').text(connected ? NetworkTables.getRobotAddress() : "disconnected");
+}
+
+$(document).ready(function(){
+    // sets a function that will be called when the robot connects/disconnects
+	NetworkTables.addRobotConnectionListener(onRobotConnection, true);
+  
+    // will load a camera from the robot's IP address on port 5800
+    loadCameraOnConnect({
+        container: '#camera_container', // where to put the img tag
+        proto: null,                    // optional, defaults to http://
+        host: null,                     // optional, if null will use robot's autodetected IP address
+        port: 5800,                     // webserver port
+        image_url: '/?action=stream',   // mjpg stream of camera
+        data_url: '/program.json',      // used to test if connection is up
+        wait_img: null,                 // optional img to show when not connected, can use SVG instead
+        error_img: null,                // optional img to show when error connecting, can use SVG instead
+        attrs: {                        // optional: attributes set on svg or img element
+            width: 640,                     // optional, stretches image to this width
+            height: 480,                    // optional, stretches image to this width
+        }
+        
+    });
+});
+
+
+</script>
+
+</body>
+</html>

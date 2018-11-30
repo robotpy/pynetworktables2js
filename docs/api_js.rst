@@ -1,5 +1,13 @@
-JavaScript API
-==============
+JS API: NetworkTables
+=====================
+
+To use these functions, add this to your HTML page:
+
+.. code-block:: html
+
+    <script src="/networktables/networktables.js"></script>
+
+**Note**:
 
 It's very important to note that the Javascript NetworkTables API currently
 has no concept of a table or subtable. When referring to keys when accessing
@@ -35,6 +43,9 @@ These functions allow your code to listen for particular NetworkTables events.
     Sets a function to be called when the robot connects/disconnects to the
     pynetworktables2js server via NetworkTables. It will also be called when
     the websocket connects/disconnects.
+    
+    When a listener function is called with a 'true' parameter, the 
+    NetworkTables.getRobotAddress() function will return a non-null value.
 
     :param f: a function that will be called with a single boolean parameter
               that indicates whether the robot is connected
@@ -93,10 +104,16 @@ NetworkTables Interface
 
     :param key: A networktables key
     :returns: true if a key is present in NetworkTables, false otherwise
+
+    .. warning:: This may not return correct results when the websocket is not
+                 connected
     
 .. js:function:: NetworkTables.getKeys()
 
     :returns: all the keys in the NetworkTables
+
+    .. warning:: This may not return correct results when the websocket is not
+                 connected
 
 .. js:function:: NetworkTables.getValue(key[, defaultValue])
 
@@ -107,10 +124,17 @@ NetworkTables Interface
     :param defaultValue: If the key isn't present in the table, return this instead
     :returns: value of key if present, ``undefined`` or ``defaultValue`` otherwise
 
+    .. warning:: This may not return correct results when the websocket is not
+                 connected
+
     .. note:: To make a fully dynamic webpage that updates when the robot
               updates values, it is recommended (and simpler) to use
               :func:`addKeyListener` or :func:`addGlobalListener` to listen
               for changes to values, instead of using this function.
+              
+.. js:function:: NetworkTables.getRobotAddress()
+
+    :returns: null if the robot is not connected, or a string otherwise
 
 .. js:function:: NetworkTables.isRobotConnected()
 

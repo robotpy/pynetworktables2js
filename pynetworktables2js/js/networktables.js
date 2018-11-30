@@ -168,7 +168,7 @@ var NetworkTables = new function () {
 	*/
 	this.addKeyListener = function(key, f, immediateNotify) {
 		var listeners = keyListeners.get(key);
-		if (listeners !== undefined) {
+		if (listeners === undefined) {
 			keyListeners.set(key, [f]);
 		} else {
 			listeners.push(f);
@@ -182,12 +182,22 @@ var NetworkTables = new function () {
 		}
 	};
 	
-	// Returns true/false if key is in NetworkTables
+	/**
+		Returns true/false if key is in NetworkTables
+
+		.. warning:: This may not return correct results when the websocket is not
+                 	 connected
+    */
 	this.containsKey = function(key) {
 		return ntCache.has(key);
 	};
 	
-	// Returns all the keys in the NetworkTables
+	/**
+		Returns all the keys in the NetworkTables
+		
+		.. warning:: This may not return correct results when the websocket is not
+                 	 connected
+    */
 	this.getKeys = function() {
 		return ntCache.getKeys();
 	};
@@ -200,6 +210,9 @@ var NetworkTables = new function () {
 	    :param defaultValue: If the key isn't present in the table, return this instead
 	    :returns: value of key if present, ``undefined`` or ``defaultValue`` otherwise
 
+	    .. warning:: This may not return correct results when the websocket is not
+                 	 connected
+
 	    .. note:: To make a fully dynamic webpage that updates when the robot
 	              updates values, it is recommended (and simpler) to use
 	              :func:`addKeyListener` or :func:`addGlobalListener` to listen
@@ -211,6 +224,11 @@ var NetworkTables = new function () {
 			return defaultValue;
 		else
 			return val;
+	};
+	
+	// returns null if robot is not connected, string otherwise
+	this.getRobotAddress = function() {
+		return robotAddress;
 	};
 	
 	// returns true if robot is connected
@@ -246,12 +264,15 @@ var NetworkTables = new function () {
 	this.putValue = function(key, value) {
 		if (!socketOpen)
 			return false;
-
+		
+		if (value === undefined)
+			throw new Error(key + ": 'undefined' passed to putValue");
+		
 		socket.send(JSON.stringify({'k': key, 'v': value}));
 		return true;
 	};
 
-	// backwards compatibility; depreciated
+	// backwards compatibility; deprecated
 	this.setValue = this.putValue;
 	
 	//
@@ -261,6 +282,7 @@ var NetworkTables = new function () {
 	var socket;
 	var socketOpen = false;
 	var robotConnected = false;
+	var robotAddress = null;
 	
 	// construct the websocket URI
 	var loc = window.location;
@@ -296,6 +318,7 @@ var NetworkTables = new function () {
 				// robot connection event
 				if (data.r !== undefined) {
 					robotConnected = data.r;
+					robotAddress = data.a;
 					for (var i in robotConnectionListeners) {
 						robotConnectionListeners[i](robotConnected);
 					}
@@ -341,6 +364,7 @@ var NetworkTables = new function () {
 					
 					socketOpen = false;
 					robotConnected = false;
+					robotAddress = null;
 					console.log("Socket closed");
 				}
 				

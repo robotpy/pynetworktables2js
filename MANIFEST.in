@@ -1,2 +1,3 @@
+include requirements.txt
 recursive-include example *
 recursive-include pynetworktables2js/js *
