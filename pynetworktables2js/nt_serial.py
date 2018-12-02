@@ -5,6 +5,26 @@ except ImportError:
 
 from networktables import NetworkTables
 
+from ntcore.constants import (
+    NT_BOOLEAN,
+    NT_DOUBLE,
+    NT_STRING,
+    NT_RAW,
+    NT_BOOLEAN_ARRAY,
+    NT_DOUBLE_ARRAY,
+    NT_STRING_ARRAY,
+)
+
+_nt_type_dict = {
+    NT_BOOLEAN: "NT_BOOLEAN",
+    NT_DOUBLE: "NT_DOUBLE",
+    NT_STRING: "NT_STRING",
+    NT_RAW: "NT_RAW",
+    NT_BOOLEAN_ARRAY: "NT_BOOLEAN_ARRAY",
+    NT_DOUBLE_ARRAY: "NT_DOUBLE_ARRAY",
+    NT_STRING_ARRAY: "NT_STRING_ARRAY",
+}
+
 __all__ = ["NTSerial"]
 
 
@@ -35,7 +55,8 @@ class NTSerial(object):
 
     def _nt_on_change(self, key, value, isNew):
         """NetworkTables global listener callback"""
-        self._send_update({"k": key, "v": value, "n": isNew})
+        value_type = _nt_type_dict[NetworkTables.getEntry(key).getType()]
+        self._send_update({"k": key, "v": value, "n": isNew, "t": value_type})
 
     # NetworkTables connection listener callbacks
     def _nt_connected(self, connected, info):

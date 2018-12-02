@@ -100,6 +100,9 @@ var NetworkTables = new function () {
 	
 	// contents of everything in NetworkTables that we know about
 	var ntCache = new d3_map();
+
+	// value types of all the contents in Networktables that we know about
+	var ntTypeCache = new d3_map();
 	
 	//
 	// NetworkTables JS API
@@ -225,6 +228,24 @@ var NetworkTables = new function () {
 		else
 			return val;
 	};
+
+	/**
+		Returns the value type that the key maps to. If the websocket is not
+	    open, this will always return null.
+
+	    :param key: A networktables key
+	    :returns: value type associated with key if present or ``undefined``
+
+			.. warning:: This may not return correct results when the websocket 
+									 is not connected
+    */
+	this.getValueType = function(key) {
+		var type = ntTypeCache.get(key);
+		if (type === undefined)
+			return null;
+		else
+			return type;
+	}
 	
 	// returns null if robot is not connected, string otherwise
 	this.getRobotAddress = function() {
@@ -338,8 +359,10 @@ var NetworkTables = new function () {
 					var key = data['k'];
 					var value = data['v'];
 					var isNew = data['n'];
+					var type = data['t'];
 					
 					ntCache.set(key, value);
+					ntTypeCache.set(key, type);
 					
 					// notify global listeners
 					for (var i in globalListeners) {
