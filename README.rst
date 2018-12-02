@@ -12,7 +12,7 @@ can connect to all FRC languages (C++, Java, LabVIEW, Python).
 
 .. note:: NetworkTables is a protocol used for robot communication in the
           FIRST Robotics Competition, and can be used to talk to
-          SmartDashboard/SFX. It does not have any security, and should never
+          Shuffleboard/SmartDashboard. It does not have any security, and should never
           be used on untrusted networks.
 
 Documentation
@@ -39,10 +39,10 @@ Easy install (Windows only)
 Manual install
 --------------
 
-Make sure to install python 2 or 3 on your computer, and on Windows you can
+Make sure to install python 3 on your computer, and on Windows you can
 execute::
 
-    py -m pip install pynetworktables2js
+    py -3 -m pip install pynetworktables2js
     
 On Linux/OSX you can execute::
 
@@ -75,11 +75,11 @@ Usage
 You can just distribute your HTML files, and run a pynetworktables server
 using the following command from inside the directory::
 
-    python -m pynetworktables2js
+    python3 -m pynetworktables2js
 
 Or on Windows::
 
-    py -m pynetworktables2js
+    py -3 -m pynetworktables2js
 
 This will start a pynetworktables2js server using Tornado (which is installed
 by default) and it will serve the current directory. You can navigate your
@@ -87,8 +87,8 @@ browser (I recommend Chrome) to http://127.0.0.1:8888 and see your website.
 
 You will want to also pass either the ``--robot`` or ``--team`` switch::
 
-    py -m pynetworktables2js --robot roborio-XXXX-frc.local
-    py -m pynetworktables2js --team XXXX
+    py -3 -m pynetworktables2js --robot roborio-XXXX-frc.local
+    py -3 -m pynetworktables2js --team XXXX
 
 Dashboard mode currently doesn't work, as the underlying support in
 pynetworktables hasn't been implemented yet for the newer FRC Driver Station.
@@ -102,17 +102,17 @@ uses `tornado <http://www.tornadoweb.org/en/stable/>`_, and one that uses
 
 Go to the 'example' directory distributed with pynetworktables2js, and run::
 
-    python tornado_server.py --robot 127.0.0.1
+    python3 tornado_server.py --robot 127.0.0.1
 
 If you want to try this out with your current robot, you can do::
 
-    python tornado_server.py --robot roborio-XXX.local
+    python3 tornado_server.py --robot roborio-XXX.local
     
 If you are running pynetworktables2js on your driver station laptop, you can
 receive robot IP information directly from the Driver Station (handy during
 actual competitions)::
 
-    python tornado_server.py --dashboard
+    python3 tornado_server.py --dashboard
 
 If you navigate your browser (I recommend Chrome) to http://127.0.0.1:8888, all
 of the current NetworkTables values will be shown as they change.
