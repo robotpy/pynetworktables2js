@@ -1,9 +1,8 @@
 "use strict";
 
 if ($ === undefined) {
-    alert("jQuery must be downloaded+included to use jquery_ext.js!");
+  alert("jQuery must be downloaded+included to use jquery_ext.js!");
 }
-
 
 /**
 	$.nt_toggle(key, function)
@@ -21,33 +20,35 @@ if ($ === undefined) {
 	
 */
 $.fn.extend({
-	nt_toggle: function(k, fn, evt) {
+  nt_toggle: function(k, fn, evt) {
+    if (fn == null) {
+      evt = "change";
+      fn = function(v) {
+        // by default, assume that it's a checkbox
+        $(this).each(function() {
+          $(this).prop("checked", v);
+        });
+      };
+    }
 
-		if (fn == null) {
-			evt = 'change';
-			fn = function(v) {
-				// by default, assume that it's a checkbox
-				$(this).each(function() {
-					$(this).prop('checked', v);
-				});
-			}
-		}
+    fn = fn.bind(this);
 
-		fn = fn.bind(this);
+    if (evt == null) evt = "click";
 
-		if (evt == null)
-			evt = 'click';
+    // only call the function when the key changes -- not when the user
+    // clicks it (this allows simultaneous pages to function correctly)
+    NetworkTables.addKeyListener(
+      k,
+      function(k, v) {
+        fn(v);
+      },
+      true
+    );
 
-		// only call the function when the key changes -- not when the user 
-		// clicks it (this allows simultaneous pages to function correctly)
-		NetworkTables.addKeyListener(k, function(k, v) {
-			fn(v);
-		}, true);
-		
-		return this.each(function() {
-			$(this).on(evt, function() {
-				NetworkTables.setValue(k, NetworkTables.getValue(k) ? false : true);
-			});
-		});
-	}
+    return this.each(function() {
+      $(this).on(evt, function() {
+        NetworkTables.setValue(k, NetworkTables.getValue(k) ? false : true);
+      });
+    });
+  }
 });
