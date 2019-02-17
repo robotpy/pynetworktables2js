@@ -4,13 +4,10 @@ const NetworkTables = new function () {
 
 
 	let robotAddress;
-//
 	let robotConnected;
-// NetworkTables socket code
 	let socketOpen;
-//
-
 	let socket;
+
 	if (!("WebSocket" in window)) {
 		alert("Your browser does not support websockets, this will fail!");
 		return;
@@ -44,7 +41,7 @@ const NetworkTables = new function () {
     	:returns: Escaped value
     */
 	this.keySelector = function(str) {
-	    return encodeURIComponent(str).replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1');
+	    return encodeURIComponent(str).replace(/([;&,.+*~':"!^#$%@\[\]()=>|])/g, '\\$1');
 	};
 	
 	//
@@ -244,34 +241,21 @@ const NetworkTables = new function () {
 
 	// construct the websocket URI
 	const loc = window.location;
-	let host;
-
-	if (loc.protocol === "https:") {
-		host = "wss:";
-	} else {
-		host = "ws:";
-	}
-	
+	const protocol = loc.protocol === "https:" ? "wss:" : "ws:";
 	// If the websocket is being served from a different host allow users 
 	// to add a data-nt-host="" attribute to the script tag loading 
 	// Networktables.
 	const ntHostElement = document.querySelector('[data-nt-host]');
-	if (ntHostElement) {
-		const ntHost = ntHostElement.getAttribute('data-nt-host');
-		host += "//" + ntHost;
-	} else {
-		host += "//" + loc.host;
-	}
-
-	host += "/networktables/ws";
+	const host = ntHostElement ? ntHostElement.getAttribute('data-nt-host') : loc.host;
+	const address = `${protocol}//${host}/networktables/ws`;
 	
 	function createSocket() {
 	
-		socket = new WebSocket(host);
+		socket = new WebSocket(address);
 		if (socket) {
 			
 			socket.onopen = function() {
-				console.log("Socket opened");
+				console.info("Socket opened");
 				
 				socketOpen = true;
 
@@ -321,7 +305,7 @@ const NetworkTables = new function () {
 					socketOpen = false;
 					robotConnected = false;
 					robotAddress = null;
-					console.log("Socket closed");
+					console.info("Socket closed");
 				}
 				
 				// respawn the websocket
