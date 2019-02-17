@@ -218,6 +218,13 @@ var NetworkTables = new function() {
         return robotAddress;
     };
 
+    /**
+     * @returns {*} an in-memory cache, which stores keys in a flat-object, instead of a tree
+     */
+    this.getNtCache = function() {
+        return ntCache;
+    };
+
     // returns true if robot is connected
     this.isRobotConnected = function() {
         return robotConnected;
