@@ -75,6 +75,7 @@ const NetworkTables = new function() {
      that indicates whether the websocket is connected
      :param immediateNotify: If true, the function will be immediately called
      with the current status of the websocket
+     :returns function to stop listening for connection events
      */
     this.addWsConnectionListener = function(f, immediateNotify = false) {
         connectionListeners.add(f);
@@ -95,6 +96,7 @@ const NetworkTables = new function() {
      that indicates whether the robot is connected
      :param immediateNotify: If true, the function will be immediately called
      with the current robot connection state
+     :returns function to stop listening for connection events
      */
     this.addRobotConnectionListener = function(f, immediateNotify = false) {
         robotConnectionListeners.add(f);
@@ -113,6 +115,7 @@ const NetworkTables = new function() {
      for entry, value: value of entry, isNew: If true, the entry has just been created
      :param immediateNotify: If true, the function will be immediately called
      with the current value of all keys
+     :returns function to stop listening for connection events
      */
     this.addGlobalListener = function(f, immediateNotify = false) {
         globalListeners.push(f);
@@ -134,6 +137,7 @@ const NetworkTables = new function() {
      for entry, value: value of entry, isNew: If true, the entry has just been created
      :param immediateNotify: If true, the function will be immediately called
      with the current value of the specified key
+     :returns function to stop listening for connection events
      */
     this.addKeyListener = function(key, f, immediateNotify = false) {
         const listeners = keyListeners.get(key);
