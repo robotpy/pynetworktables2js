@@ -1,56 +1,20 @@
 "use strict";
 
-var NetworkTables = new function () {
-	
+const NetworkTables = new function () {
+
+
+	let robotAddress;
+//
+	let robotConnected;
+// NetworkTables socket code
+	let socketOpen;
+//
+
+	let socket;
 	if (!("WebSocket" in window)) {
 		alert("Your browser does not support websockets, this will fail!");
 		return;
 	}
-	
-	//
-	// javascript map implementation
-	// map functions copied from d3 (BSD license: Mike Bostock)
-	//
-	
-	var d3_map_proto = "__proto__", d3_map_zero = "\x00";
-	
-	// we use encodeURIComponent/decodeURIComponent to allow weird values
-	// into the maps we create
-	
-	function d3_map_escape(key) {
-		return (key += "") === d3_map_proto || key[0] === d3_map_zero ? d3_map_zero + encodeURIComponent(key) : encodeURIComponent(key);
-	}
-	
-	function d3_map_unescape(key) {
-		return (key += "")[0] === d3_map_zero ? decodeURIComponent(key.slice(1)) : decodeURIComponent(key);
-	}
-	
-	var d3_map = function() {
-		
-		this._ = Object.create(null); 
-		
-		this.forEach = function(f) {
-			for (var key in this._) f.call(this, d3_map_unescape(key), this._[key]);
-		};
-		
-		this.get = function(key) {
-			return this._[d3_map_escape(key)];
-		};
-		
-		this.getKeys = function() {
-			var keys = [];
-			for(var key in this._) keys.push(d3_map_unescape(key));
-			return keys;
-		};
-		
-		this.has = function(key) {
-			return d3_map_escape(key) in this._;
-		};
-		
-		this.set = function(key, value) {
-			return this._[d3_map_escape(key)] = value;
-		};
-	};
 	
 	//
 	// Utility functions
@@ -61,7 +25,7 @@ var NetworkTables = new function () {
     	is safe to store NetworkTables keys in.
     */
 	this.create_map = function() {
-		return new d3_map();
+		return new Map();
 	};
 	
 	/**
@@ -89,17 +53,17 @@ var NetworkTables = new function () {
 	
 	
 	// functions that listen for connection changes
-	var connectionListeners = [];
-	var robotConnectionListeners = [];
+	const connectionListeners = new Set();
+	const robotConnectionListeners = new Set();
 	
 	// functions that listen for everything
-	var globalListeners = [];
+	const globalListeners = new Set();
 	
 	// functions that listen for specific keys
-	var keyListeners = new d3_map();
+	const keyListeners = new Map();
 	
 	// contents of everything in NetworkTables that we know about
-	var ntCache = new d3_map();
+	let ntCache = new Map();
 	
 	//
 	// NetworkTables JS API
@@ -114,9 +78,9 @@ var NetworkTables = new function () {
 	                            with the current status of the websocket
     */
 	this.addWsConnectionListener = function(f, immediateNotify) {
-		connectionListeners.push(f);
+		connectionListeners.add(f);
 		
-		if (immediateNotify == true) {
+		if (immediateNotify === true) {
 			f(socketOpen);
 		}
 	};
@@ -132,12 +96,12 @@ var NetworkTables = new function () {
 	                            with the current robot connection state
 	*/
 	this.addRobotConnectionListener = function(f, immediateNotify) {
-		robotConnectionListeners.push(f);
+		robotConnectionListeners.add(f);
 		
-		if (immediateNotify == true) {
+		if (immediateNotify === true) {
 			f(robotConnected);
 		}
-	}
+	};
 	
 	/**
 		Set a function that will be called whenever any NetworkTables value is changed
@@ -148,9 +112,9 @@ var NetworkTables = new function () {
 	                            with the current value of all keys
     */
 	this.addGlobalListener = function(f, immediateNotify) {
-		globalListeners.push(f);
+		globalListeners.add(f);
 		
-		if (immediateNotify == true) {
+		if (immediateNotify === true) {
 			ntCache.forEach(function(k, v){
 				f(k, v, true);
 			});
@@ -167,15 +131,15 @@ var NetworkTables = new function () {
 	                            with the current value of the specified key
 	*/
 	this.addKeyListener = function(key, f, immediateNotify) {
-		var listeners = keyListeners.get(key);
+		const listeners = keyListeners.get(key);
 		if (listeners === undefined) {
-			keyListeners.set(key, [f]);
+			keyListeners.set(key, new Set([f]));
 		} else {
-			listeners.push(f);
+			listeners.add(f);
 		}
 		
-		if (immediateNotify == true) {
-			var v = ntCache.get(key);
+		if (immediateNotify === true) {
+			const v = ntCache.get(key);
 			if (v !== undefined) {
 				f(key, v, true);
 			}
@@ -199,7 +163,7 @@ var NetworkTables = new function () {
                  	 connected
     */
 	this.getKeys = function() {
-		return ntCache.getKeys();
+		return ntCache.keys();
 	};
 	
 	/**
@@ -219,7 +183,7 @@ var NetworkTables = new function () {
 	              for changes to values, instead of using this function.
     */
 	this.getValue = function(key, defaultValue) {
-		var val = ntCache.get(key);
+		const val = ntCache.get(key);
 		if (val === undefined)
 			return defaultValue;
 		else
@@ -274,20 +238,14 @@ var NetworkTables = new function () {
 
 	// backwards compatibility; deprecated
 	this.setValue = this.putValue;
-	
-	//
-	// NetworkTables socket code
-	//
-	
-	var socket;
-	var socketOpen = false;
-	var robotConnected = false;
-	var robotAddress = null;
-	
+	socketOpen = false;
+	robotConnected = false;
+	robotAddress = null;
+
 	// construct the websocket URI
-	var loc = window.location;
-	var host;
-	
+	const loc = window.location;
+	let host;
+
 	if (loc.protocol === "https:") {
 		host = "wss:";
 	} else {
@@ -297,9 +255,9 @@ var NetworkTables = new function () {
 	// If the websocket is being served from a different host allow users 
 	// to add a data-nt-host="" attribute to the script tag loading 
 	// Networktables.
-	var ntHostElement = document.querySelector('[data-nt-host]');
+	const ntHostElement = document.querySelector('[data-nt-host]');
 	if (ntHostElement) {
-		var ntHost = ntHostElement.getAttribute('data-nt-host');
+		const ntHost = ntHostElement.getAttribute('data-nt-host');
 		host += "//" + ntHost;
 	} else {
 		host += "//" + loc.host;
@@ -316,42 +274,34 @@ var NetworkTables = new function () {
 				console.log("Socket opened");
 				
 				socketOpen = true;
-				
-				for (var i in connectionListeners) {
-					connectionListeners[i](true);
-				}
+
+				connectionListeners.forEach(f => f(true));
 			};
 			
 			socket.onmessage = function(msg) {
-				var data = JSON.parse(msg.data);
-				
+				const data = JSON.parse(msg.data);
+
 				// robot connection event
 				if (data.r !== undefined) {
 					robotConnected = data.r;
 					robotAddress = data.a;
-					for (var i in robotConnectionListeners) {
-						robotConnectionListeners[i](robotConnected);
-					}
+					robotConnectionListeners.forEach(f => f(robotConnected))
 				} else {
 				
 					// data changed on websocket
-					var key = data['k'];
-					var value = data['v'];
-					var isNew = data['n'];
-					
+					const key = data['k'];
+					const value = data['v'];
+					const isNew = data['n'];
+
 					ntCache.set(key, value);
 					
 					// notify global listeners
-					for (var i in globalListeners) {
-						globalListeners[i](key, value, isNew);
-					}
+					globalListeners.forEach(f => f(key, value, isNew));
 					
 					// notify key-specific listeners
-					var listeners = keyListeners.get(key);
+					const listeners = keyListeners.get(key);
 					if (listeners !== undefined) {
-						for (var i in listeners) {
-							listeners[i](key, value, isNew);
-						}
+						listeners.forEach(f => f(key, value, isNew));
 					}
 				}
 			};
@@ -359,18 +309,14 @@ var NetworkTables = new function () {
 			socket.onclose = function() {
 				
 				if (socketOpen) {
-				
-					for (var i in connectionListeners) {
-						connectionListeners[i](false);
-					}
-					
-					for (var i in robotConnectionListeners) {
-						robotConnectionListeners[i](false);
-					}
+
+					connectionListeners.forEach(f => f(false));
+
+					robotConnectionListeners.forEach(f => f(false));
 					
 					// clear ntCache, it's no longer valid
 					// TODO: Is this true?
-					ntCache = new d3_map();
+					ntCache = new Map();
 					
 					socketOpen = false;
 					robotConnected = false;
@@ -385,6 +331,6 @@ var NetworkTables = new function () {
 	}
 	
 	createSocket();
-}
+};
 
 
