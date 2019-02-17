@@ -1,390 +1,238 @@
 "use strict";
 
-var NetworkTables = new function () {
-	
-	if (!("WebSocket" in window)) {
-		alert("Your browser does not support websockets, this will fail!");
-		return;
-	}
-	
-	//
-	// javascript map implementation
-	// map functions copied from d3 (BSD license: Mike Bostock)
-	//
-	
-	var d3_map_proto = "__proto__", d3_map_zero = "\x00";
-	
-	// we use encodeURIComponent/decodeURIComponent to allow weird values
-	// into the maps we create
-	
-	function d3_map_escape(key) {
-		return (key += "") === d3_map_proto || key[0] === d3_map_zero ? d3_map_zero + encodeURIComponent(key) : encodeURIComponent(key);
-	}
-	
-	function d3_map_unescape(key) {
-		return (key += "")[0] === d3_map_zero ? decodeURIComponent(key.slice(1)) : decodeURIComponent(key);
-	}
-	
-	var d3_map = function() {
-		
-		this._ = Object.create(null); 
-		
-		this.forEach = function(f) {
-			for (var key in this._) f.call(this, d3_map_unescape(key), this._[key]);
-		};
-		
-		this.get = function(key) {
-			return this._[d3_map_escape(key)];
-		};
-		
-		this.getKeys = function() {
-			var keys = [];
-			for(var key in this._) keys.push(d3_map_unescape(key));
-			return keys;
-		};
-		
-		this.has = function(key) {
-			return d3_map_escape(key) in this._;
-		};
-		
-		this.set = function(key, value) {
-			return this._[d3_map_escape(key)] = value;
-		};
-	};
-	
-	//
-	// Utility functions
-	//
-	
-	/**
-		Creates a new empty map (or hashtable) object and returns it. The map
-    	is safe to store NetworkTables keys in.
-    */
-	this.create_map = function() {
-		return new d3_map();
-	};
-	
-	/**
-		Escapes NetworkTables keys so that they're valid HTML identifiers.
+const NetworkTables = new function() {
+    /**
+     * Maps each socket state to its underlying numeric representation
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
+     */
+    const SOCKET_STATE = {
+        CONNECTING: 0,
+        OPEN: 1,
+        CLOSING: 2,
+        CLOSED: 3
+    };
 
-		:param key: A networktables key
-    	:returns: Escaped value
-    */
-	this.keyToId = encodeURIComponent;
-	
-	/**
-		Escapes special characters and returns a valid jQuery selector. Useful as
-    	NetworkTables does not really put any limits on what keys can be used.
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws";
+    /**
+     * Find an element with a data-nt-host attribute, which will specify the server's address
+     * @type {Element}
+     */
+    const ntHostElement = document.querySelector('[data-nt-host]');
+    const address = ntHostElement ? ntHostElement.getAttribute('data-nt-host') : window.location.host;
+    const socketAddress = `${protocol}//${address}/networktables/ws`;
 
-    	:param key: A networktables key
-    	:returns: Escaped value
-    */
-	this.keySelector = function(str) {
-	    return encodeURIComponent(str).replace(/([;&,\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1');
-	};
-	
-	//
-	// NetworkTables internal variables
-	//
-	
-	
-	// functions that listen for connection changes
-	var connectionListeners = [];
-	var robotConnectionListeners = [];
-	
-	// functions that listen for everything
-	var globalListeners = [];
-	
-	// functions that listen for specific keys
-	var keyListeners = new d3_map();
-	
-	// contents of everything in NetworkTables that we know about
-	var ntCache = new d3_map();
-	
-	//
-	// NetworkTables JS API
-	//
-	
-	/**
-		Sets a function to be called when the websocket connects/disconnects
+    let socket = new WebSocket(socketAddress);
+    let robot = {
+        address: null,
+        connected: false
+    };
 
-	    :param f: a function that will be called with a single boolean parameter
-	              that indicates whether the websocket is connected
-	    :param immediateNotify: If true, the function will be immediately called
-	                            with the current status of the websocket
-    */
-	this.addWsConnectionListener = function(f, immediateNotify) {
-		connectionListeners.push(f);
-		
-		if (immediateNotify == true) {
-			f(socketOpen);
-		}
-	};
-	
-	/**
-		Sets a function to be called when the robot connects/disconnects to the
-	    pynetworktables2js server via NetworkTables. It will also be called when
-	    the websocket connects/disconnects.
+    /**
+     * Generates a valid HTML identifier from a NetworkTable key
+     * @deprecated This is here for compatibility with older programs. Please use encodeURIComponent directly
+     */
+    this.keyToId = encodeURIComponent;
 
-	    :param f: a function that will be called with a single boolean parameter
-	              that indicates whether the robot is connected
-	    :param immediateNotify: If true, the function will be immediately called
-	                            with the current robot connection state
-	*/
-	this.addRobotConnectionListener = function(f, immediateNotify) {
-		robotConnectionListeners.push(f);
-		
-		if (immediateNotify == true) {
-			f(robotConnected);
-		}
-	}
-	
-	/**
-		Set a function that will be called whenever any NetworkTables value is changed
+    /**
+     * Generates a valid CSS selector from a NetworkTable key
+     * @param {String} key A NetworkTable key
+     * @returns {string} A valid CSS selector
+     */
+    this.keySelector = function(key) {
+        return encodeURIComponent(key).replace(/([;&,.+*~':"!^#$%@\[\]()=>|])/g, '\\$1');
+    };
 
-	    :param f: When any key changes, this function will be called with the following parameters; key: key name
-	              for entry, value: value of entry, isNew: If true, the entry has just been created
-	    :param immediateNotify: If true, the function will be immediately called
-	                            with the current value of all keys
-    */
-	this.addGlobalListener = function(f, immediateNotify) {
-		globalListeners.push(f);
-		
-		if (immediateNotify == true) {
-			ntCache.forEach(function(k, v){
-				f(k, v, true);
-			});
-		}
-	};
-	
-	/**
-	    Set a function that will be called whenever a value for a particular key is changed in NetworkTables
+    const connectionListeners = new Set();
+    const robotConnectionListeners = new Set();
+    const globalListeners = new Set();
 
-	    :param key: A networktables key to listen for
-	    :param f: When the key changes, this function will be called with the following parameters; key: key name
-	              for entry, value: value of entry, isNew: If true, the entry has just been created
-	    :param immediateNotify: If true, the function will be immediately called
-	                            with the current value of the specified key
-	*/
-	this.addKeyListener = function(key, f, immediateNotify) {
-		var listeners = keyListeners.get(key);
-		if (listeners === undefined) {
-			keyListeners.set(key, [f]);
-		} else {
-			listeners.push(f);
-		}
-		
-		if (immediateNotify == true) {
-			var v = ntCache.get(key);
-			if (v !== undefined) {
-				f(key, v, true);
-			}
-		}
-	};
-	
-	/**
-		Returns true/false if key is in NetworkTables
+    const keyListeners = new Map();
+    let ntCache = new Map(); // Store all discovered values in memory
 
-		.. warning:: This may not return correct results when the websocket is not
-                 	 connected
-    */
-	this.containsKey = function(key) {
-		return ntCache.has(key);
-	};
-	
-	/**
-		Returns all the keys in the NetworkTables
-		
-		.. warning:: This may not return correct results when the websocket is not
-                 	 connected
-    */
-	this.getKeys = function() {
-		return ntCache.getKeys();
-	};
-	
-	/**
-		Returns the value that the key maps to. If the websocket is not
-	    open, this will always return the default value specified.
+    /**
+     * Listen for the websocket to connect or disconnect from the server
+     * @param {function(boolean)} f Called when the websocket's readyState changes
+     * @param {boolean} immediateNotify Whether f should be called with the current connection status
+     * @returns {function(): boolean} a function you can call to stop listening
+     */
+    this.addWsConnectionListener = function(f, immediateNotify = false) {
+        connectionListeners.add(f);
 
-	    :param key: A networktables key
-	    :param defaultValue: If the key isn't present in the table, return this instead
-	    :returns: value of key if present, ``undefined`` or ``defaultValue`` otherwise
+        if (immediateNotify) f(socket.readyState === SOCKET_STATE.OPEN);
 
-	    .. warning:: This may not return correct results when the websocket is not
-                 	 connected
+        return () => connectionListeners.delete(f);
+    };
 
-	    .. note:: To make a fully dynamic webpage that updates when the robot
-	              updates values, it is recommended (and simpler) to use
-	              :func:`addKeyListener` or :func:`addGlobalListener` to listen
-	              for changes to values, instead of using this function.
-    */
-	this.getValue = function(key, defaultValue) {
-		var val = ntCache.get(key);
-		if (val === undefined)
-			return defaultValue;
-		else
-			return val;
-	};
-	
-	// returns null if robot is not connected, string otherwise
-	this.getRobotAddress = function() {
-		return robotAddress;
-	};
-	
-	// returns true if robot is connected
-	this.isRobotConnected = function() {
-		return robotConnected;
-	};
+    /**
+     * Listen for the robot to connect or disconnect from the server
+     * @param {function(boolean)} f Called when the server connects the robot
+     * @param {boolean} immediateNotify Whether f should be called with the current connection status
+     * @returns {function(): boolean} a function you can call to stop listening
+     */
+    this.addRobotConnectionListener = function(f, immediateNotify = false) {
+        robotConnectionListeners.add(f);
 
-	// returns true if websocket is connected
-	this.isWsConnected = function() {
-		return socketOpen;
-	};
-	
-	/**
-		Sets the value in NetworkTables. If the websocket is not connected, the
-	    value will be discarded.
+        if (immediateNotify) f(robot.connected);
 
-	    :param key: A networktables key
-	    :param value: The value to set (see warnings)
-	    :returns: True if the websocket is open, False otherwise
+        return () => robotConnectionListeners.delete(f)
+    };
 
-	    .. note:: When you put a value, it will not be immediately available
-	              from ``getValue``. The value must be sent to the NetworkTables
-	              server first, which will then send the change notification
-	              back up to the javascript NetworkTables key/value cache.
+    /**
+     * Listen for any key changes on any table or subtable
+     * @param {function(string, *, boolean)} f Called when a key's value is changed
+     * @param {boolean} immediateNotify Whether f should be called with the current keys
+     * @returns {function(): boolean} a function you can call to stop listening
+     */
+    this.addGlobalListener = function(f, immediateNotify = false) {
+        globalListeners.add(f);
 
-	    .. warning:: NetworkTables is type sensitive, whereas Javascript is loosely
-	                 typed. This function will **not** check the type of the value
-	                 that you are trying to put, so you must be careful to only put
-	                 the correct values that are expected. If your robot tries to
-	                 retrieve the value and it is an unexpected type, an exception
-	                 will be thrown and your robot may crash. You have been warned.
-    */
-	this.putValue = function(key, value) {
-		if (!socketOpen)
-			return false;
-		
-		if (value === undefined)
-			throw new Error(key + ": 'undefined' passed to putValue");
-		
-		socket.send(JSON.stringify({'k': key, 'v': value}));
-		return true;
-	};
+        if (immediateNotify) ntCache.forEach((key, value) => f(key, value, true));
 
-	// backwards compatibility; deprecated
-	this.setValue = this.putValue;
-	
-	//
-	// NetworkTables socket code
-	//
-	
-	var socket;
-	var socketOpen = false;
-	var robotConnected = false;
-	var robotAddress = null;
-	
-	// construct the websocket URI
-	var loc = window.location;
-	var host;
-	
-	if (loc.protocol === "https:") {
-		host = "wss:";
-	} else {
-		host = "ws:";
-	}
-	
-	// If the websocket is being served from a different host allow users 
-	// to add a data-nt-host="" attribute to the script tag loading 
-	// Networktables.
-	var ntHostElement = document.querySelector('[data-nt-host]');
-	if (ntHostElement) {
-		var ntHost = ntHostElement.getAttribute('data-nt-host');
-		host += "//" + ntHost;
-	} else {
-		host += "//" + loc.host;
-	}
+        return () => globalListeners.delete(f);
+    };
 
-	host += "/networktables/ws";
-	
-	function createSocket() {
-	
-		socket = new WebSocket(host);
-		if (socket) {
-			
-			socket.onopen = function() {
-				console.log("Socket opened");
-				
-				socketOpen = true;
-				
-				for (var i in connectionListeners) {
-					connectionListeners[i](true);
-				}
-			};
-			
-			socket.onmessage = function(msg) {
-				var data = JSON.parse(msg.data);
-				
-				// robot connection event
-				if (data.r !== undefined) {
-					robotConnected = data.r;
-					robotAddress = data.a;
-					for (var i in robotConnectionListeners) {
-						robotConnectionListeners[i](robotConnected);
-					}
-				} else {
-				
-					// data changed on websocket
-					var key = data['k'];
-					var value = data['v'];
-					var isNew = data['n'];
-					
-					ntCache.set(key, value);
-					
-					// notify global listeners
-					for (var i in globalListeners) {
-						globalListeners[i](key, value, isNew);
-					}
-					
-					// notify key-specific listeners
-					var listeners = keyListeners.get(key);
-					if (listeners !== undefined) {
-						for (var i in listeners) {
-							listeners[i](key, value, isNew);
-						}
-					}
-				}
-			};
-			
-			socket.onclose = function() {
-				
-				if (socketOpen) {
-				
-					for (var i in connectionListeners) {
-						connectionListeners[i](false);
-					}
-					
-					for (var i in robotConnectionListeners) {
-						robotConnectionListeners[i](false);
-					}
-					
-					// clear ntCache, it's no longer valid
-					// TODO: Is this true?
-					ntCache = new d3_map();
-					
-					socketOpen = false;
-					robotConnected = false;
-					robotAddress = null;
-					console.log("Socket closed");
-				}
-				
-				// respawn the websocket
-				setTimeout(createSocket, 300);
-			};
-		}
-	}
-	
-	createSocket();
-}
+    /**
+     * Listen for a key to get a new value
+     * @param {string} key A NetworkTable key
+     * @param {function(string, *, boolean)} f Called when the key gets a new value
+     * @param {boolean} immediateNotify Whether f should be called with the current value
+     * @returns {function(): boolean} a function you can call to stop listening
+     */
+    this.addKeyListener = function(key, f, immediateNotify = false) {
+        const listeners = keyListeners.get(key);
+        if (listeners === undefined) {
+            keyListeners.set(key, new Set([f]));
+        } else {
+            listeners.add(f);
+        }
 
+        if (immediateNotify) {
+            const v = ntCache.get(key);
+            if (v !== undefined) f(key, v, true);
+        }
 
+        return () => keyListeners.delete(key);
+    };
+
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * @param {string} key A NetworkTable key
+     * @returns {boolean} true if NetworkTables contains the key
+     */
+    this.containsKey = function(key) {
+        return ntCache.has(key);
+    };
+
+    /**
+     * @returns {IterableIterator<*>} a list of keys in the NetworkTable
+     */
+    this.getKeys = function() {
+        return ntCache.keys();
+    };
+
+    /**
+     * @param {string} key A NetworkTable key
+     * @param defaultValue The value to return if the key does not have an attached value
+     * @returns {*} the value corresponding to key, or defaultValue of that is not present
+     */
+    this.getValue = function(key, defaultValue) {
+        const val = ntCache.get(key);
+        if (val === undefined)
+            return defaultValue;
+        else
+            return val;
+    };
+
+    /**
+     * @returns {string | null} the robot's IP address, or null if it is not connected
+     */
+    this.getRobotAddress = function() {
+        return robot.address;
+    };
+
+    /**
+     * @returns {boolean} true if the robot is connected to the server
+     */
+    this.isRobotConnected = function() {
+        return robot.connected;
+    };
+
+    /**
+     * @returns {boolean} true if the websocket is connected to the server
+     */
+    this.isWsConnected = function() {
+        return socket.readyState === SOCKET_STATE.OPEN;
+    };
+
+    /**
+     * Updates the value in the NetworkTable. Remember that the value provided should be of the correct type, and if it
+     * is not, may crash your robot. You've been warned.
+     * @param {string} key A NetworkTable key
+     * @param {*} value The value to put in the NetworkTable at key
+     * @returns {boolean} true if the operation was queued
+     */
+    this.putValue = function(key, value) {
+        if (socket.readyState !== SOCKET_STATE.OPEN) return false;
+
+        if (value === undefined) throw new Error(key + ": 'undefined' passed to putValue");
+
+        socket.send(JSON.stringify({'k': key, 'v': value}));
+        return true;
+    };
+
+    function createSocket() {
+        socket = new WebSocket(socketAddress);
+
+        socket.onopen = function() {
+            console.info("Socket opened");
+            connectionListeners.forEach(listener => listener(true));
+        };
+
+        socket.onmessage = function(msg) {
+            const data = JSON.parse(msg.data);
+
+            // robot connection event
+            if (data.r !== undefined) {
+                // noinspection JSUnresolvedVariable
+                robot = {
+                    address: data.a,
+                    connected: data.r
+                };
+                robotConnectionListeners.forEach(listener => listener(true));
+            } else {
+                // data changed on websocket
+                const key = data['k'];
+                const value = data['v'];
+                const isNew = data['n'];
+
+                ntCache.set(key, value);
+
+                // notify global listeners
+                globalListeners.forEach(listener => listener(key, value, isNew));
+
+                // notify key-specific listeners
+                const listeners = keyListeners.get(key);
+                if (listeners !== undefined) {
+                    listeners.forEach(listener => listener(key, value, isNew));
+                }
+            }
+        };
+
+        socket.onclose = function() {
+            connectionListeners.forEach(listener => listener(false));
+            robotConnectionListeners.forEach(listener => listener(false));
+
+            ntCache = new Map(); // The cache is no longer valid, so we'll clear it
+
+            robot = {
+                address: null,
+                connected: false
+            };
+            console.info("Socket closed");
+
+            setTimeout(createSocket, 300);
+        };
+    }
+
+    createSocket();
+};
