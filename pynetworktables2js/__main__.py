@@ -12,13 +12,13 @@
 from __future__ import print_function
 
 import os
-from os.path import abspath, dirname, exists, join
 from optparse import OptionParser
+from os.path import abspath, exists, join
 
 import tornado.web
+from networktables import NetworkTables
 from tornado.ioloop import IOLoop
 
-from networktables import NetworkTables
 from . import get_handlers, NonCachingStaticFileHandler
 
 try:
@@ -30,7 +30,7 @@ import logging
 
 logger = logging.getLogger("dashboard")
 
-log_datefmt = "%H:%M:%S"
+log_date_fmt = "%H:%M:%S"
 log_format = "%(asctime)s:%(msecs)03d %(levelname)-8s: %(name)-20s: %(message)s"
 
 
@@ -48,7 +48,7 @@ def init_networktables(options):
         logger.info("Connecting to networktables in Dashboard mode")
         NetworkTables.setDashboardMode()
 
-    logger.info("Networktables Initialized")
+    logger.info("NetworkTables Initialized")
 
 
 def main():
@@ -89,7 +89,7 @@ def main():
 
     # Setup logging
     logging.basicConfig(
-        datefmt=log_datefmt,
+        datefmt=log_date_fmt,
         format=log_format,
         level=logging.DEBUG if options.verbose else logging.INFO,
     )
@@ -109,7 +109,7 @@ def main():
         exit(1)
 
     if not exists(index_html):
-        logger.warn("%s not found", index_html)
+        logger.warning("%s not found", index_html)
 
     app = tornado.web.Application(
         get_handlers()

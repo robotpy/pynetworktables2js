@@ -268,7 +268,7 @@ var NetworkTables = new function () {
 		if (value === undefined)
 			throw new Error(key + ": 'undefined' passed to putValue");
 		
-		socket.send(JSON.stringify({'k': key, 'v': value}));
+		socket.send(CBOR.encode({'k': key, 'v': value}));
 		return true;
 	};
 
@@ -310,6 +310,7 @@ var NetworkTables = new function () {
 	function createSocket() {
 	
 		socket = new WebSocket(host);
+		socket.binaryType = "arraybuffer";
 		if (socket) {
 			
 			socket.onopen = function() {
@@ -323,7 +324,7 @@ var NetworkTables = new function () {
 			};
 			
 			socket.onmessage = function(msg) {
-				var data = JSON.parse(msg.data);
+				var data = CBOR.decode(msg.data);
 				
 				// robot connection event
 				if (data.r !== undefined) {

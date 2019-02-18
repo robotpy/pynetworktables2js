@@ -1,2 +1,3 @@
+cbor
 tornado>=4.0
 pynetworktables>=2019.0.0

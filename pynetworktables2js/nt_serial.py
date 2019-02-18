@@ -1,7 +1,8 @@
-try:
-    import ujson as json
-except ImportError:
-    import json
+# try:
+#     import ujson as json
+# except ImportError:
+#     import json
+import cbor
 
 from networktables import NetworkTables
 
@@ -24,13 +25,13 @@ class NTSerial(object):
 
     def process_update(self, update):
         """Process an incoming update from a remote NetworkTables"""
-        data = json.loads(update)
+        data = cbor.loads(update)
         NetworkTables.getEntry(data["k"]).setValue(data["v"])
 
     def _send_update(self, data):
         """Send a NetworkTables update via the stored send_update callback"""
         if isinstance(data, dict):
-            data = json.dumps(data)
+            data = cbor.dumps(data)
         self.update_callback(data)
 
     def _nt_on_change(self, key, value, isNew):
