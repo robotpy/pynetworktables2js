@@ -112,12 +112,20 @@ var NetworkTables = new function () {
 	              that indicates whether the websocket is connected
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current status of the websocket
+	 	:returns: a function that will unsubscribe
     */
 	this.addWsConnectionListener = function(f, immediateNotify) {
 		connectionListeners.push(f);
 		
 		if (immediateNotify == true) {
 			f(socketOpen);
+		}
+
+		return function() {
+			const index = connectionListeners.indexOf(f);
+			if (index !== -1) {
+				connectionListeners.splice(index, 1);
+			}
 		}
 	};
 	
@@ -130,12 +138,20 @@ var NetworkTables = new function () {
 	              that indicates whether the robot is connected
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current robot connection state
+	 	:returns: a function that will unsubscribe
 	*/
 	this.addRobotConnectionListener = function(f, immediateNotify) {
 		robotConnectionListeners.push(f);
 		
 		if (immediateNotify == true) {
 			f(robotConnected);
+		}
+
+		return function() {
+			const index = robotConnectionListeners.indexOf(f);
+			if (index !== -1) {
+				robotConnectionListeners.splice(index, 1);
+			}
 		}
 	}
 	
@@ -146,6 +162,7 @@ var NetworkTables = new function () {
 	              for entry, value: value of entry, isNew: If true, the entry has just been created
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current value of all keys
+	 	:returns: a function that will unsubscribe
     */
 	this.addGlobalListener = function(f, immediateNotify) {
 		globalListeners.push(f);
@@ -154,6 +171,13 @@ var NetworkTables = new function () {
 			ntCache.forEach(function(k, v){
 				f(k, v, true);
 			});
+		}
+
+		return function() {
+			const index = globalListeners.indexOf(f);
+			if (index !== -1) {
+				globalListeners.splice(index, 1);
+			}
 		}
 	};
 	
@@ -165,6 +189,7 @@ var NetworkTables = new function () {
 	              for entry, value: value of entry, isNew: If true, the entry has just been created
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current value of the specified key
+	 	:returns: a function that will unsubscribe
 	*/
 	this.addKeyListener = function(key, f, immediateNotify) {
 		var listeners = keyListeners.get(key);
@@ -178,6 +203,13 @@ var NetworkTables = new function () {
 			var v = ntCache.get(key);
 			if (v !== undefined) {
 				f(key, v, true);
+			}
+		}
+
+		return function() {
+			const index = keyListeners.get(key).indexOf(f);
+			if (index !== -1) {
+				keyListeners.get(key).splice(index, 1);
 			}
 		}
 	};
