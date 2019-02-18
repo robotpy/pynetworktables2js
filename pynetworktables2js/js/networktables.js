@@ -112,6 +112,7 @@ var NetworkTables = new function () {
 	              that indicates whether the websocket is connected
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current status of the websocket
+	 	:returns: a function that will unsubscribe
     */
 	this.addWsConnectionListener = function(f, immediateNotify) {
 		connectionListeners.push(f);
@@ -137,6 +138,7 @@ var NetworkTables = new function () {
 	              that indicates whether the robot is connected
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current robot connection state
+	 	:returns: a function that will unsubscribe
 	*/
 	this.addRobotConnectionListener = function(f, immediateNotify) {
 		robotConnectionListeners.push(f);
@@ -160,6 +162,7 @@ var NetworkTables = new function () {
 	              for entry, value: value of entry, isNew: If true, the entry has just been created
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current value of all keys
+	 	:returns: a function that will unsubscribe
     */
 	this.addGlobalListener = function(f, immediateNotify) {
 		globalListeners.push(f);
@@ -186,6 +189,7 @@ var NetworkTables = new function () {
 	              for entry, value: value of entry, isNew: If true, the entry has just been created
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current value of the specified key
+	 	:returns: a function that will unsubscribe
 	*/
 	this.addKeyListener = function(key, f, immediateNotify) {
 		var listeners = keyListeners.get(key);
