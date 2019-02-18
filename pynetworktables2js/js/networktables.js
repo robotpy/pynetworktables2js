@@ -119,6 +119,13 @@ var NetworkTables = new function () {
 		if (immediateNotify == true) {
 			f(socketOpen);
 		}
+
+		return function() {
+			const index = connectionListeners.indexOf(f);
+			if (index !== -1) {
+				connectionListeners.splice(index, 1);
+			}
+		}
 	};
 	
 	/**
@@ -137,6 +144,13 @@ var NetworkTables = new function () {
 		if (immediateNotify == true) {
 			f(robotConnected);
 		}
+
+		return function() {
+			const index = robotConnectionListeners.indexOf(f);
+			if (index !== -1) {
+				robotConnectionListeners.splice(index, 1);
+			}
+		}
 	}
 	
 	/**
@@ -154,6 +168,13 @@ var NetworkTables = new function () {
 			ntCache.forEach(function(k, v){
 				f(k, v, true);
 			});
+		}
+
+		return function() {
+			const index = globalListeners.indexOf(f);
+			if (index !== -1) {
+				globalListeners.splice(index, 1);
+			}
 		}
 	};
 	
@@ -178,6 +199,13 @@ var NetworkTables = new function () {
 			var v = ntCache.get(key);
 			if (v !== undefined) {
 				f(key, v, true);
+			}
+		}
+
+		return function() {
+			const index = keyListeners.get(key).indexOf(f);
+			if (index !== -1) {
+				keyListeners.get(key).splice(index, 1);
 			}
 		}
 	};
