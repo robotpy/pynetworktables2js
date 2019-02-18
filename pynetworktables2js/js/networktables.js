@@ -12,7 +12,7 @@ const NetworkTables = new function () {
 		alert("Your browser does not support websockets, this will fail!");
 		return;
 	}
-	
+
 	//
 	// Utility functions
 	//
@@ -73,6 +73,7 @@ const NetworkTables = new function () {
 	              that indicates whether the websocket is connected
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current status of the websocket
+	 	:returns: a function that will unsubscribe
     */
 	this.addWsConnectionListener = function(f, immediateNotify) {
 		connectionListeners.add(f);
@@ -80,6 +81,8 @@ const NetworkTables = new function () {
 		if (immediateNotify === true) {
 			f(socketOpen);
 		}
+
+		return () => connectionListeners.delete(f);
 	};
 	
 	/**
@@ -91,6 +94,7 @@ const NetworkTables = new function () {
 	              that indicates whether the robot is connected
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current robot connection state
+	 	:returns: a function that will unsubscribe
 	*/
 	this.addRobotConnectionListener = function(f, immediateNotify) {
 		robotConnectionListeners.add(f);
@@ -98,6 +102,8 @@ const NetworkTables = new function () {
 		if (immediateNotify === true) {
 			f(robotConnected);
 		}
+
+		return () => robotConnectionListeners.delete(f);
 	};
 	
 	/**
@@ -107,6 +113,7 @@ const NetworkTables = new function () {
 	              for entry, value: value of entry, isNew: If true, the entry has just been created
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current value of all keys
+	 	:returns: a function that will unsubscribe
     */
 	this.addGlobalListener = function(f, immediateNotify) {
 		globalListeners.add(f);
@@ -116,6 +123,8 @@ const NetworkTables = new function () {
 				f(k, v, true);
 			});
 		}
+
+		return () => globalListeners.delete(f);
 	};
 	
 	/**
@@ -126,6 +135,7 @@ const NetworkTables = new function () {
 	              for entry, value: value of entry, isNew: If true, the entry has just been created
 	    :param immediateNotify: If true, the function will be immediately called
 	                            with the current value of the specified key
+	 	:returns: a function that will unsubscribe
 	*/
 	this.addKeyListener = function(key, f, immediateNotify) {
 		const listeners = keyListeners.get(key);
@@ -141,6 +151,8 @@ const NetworkTables = new function () {
 				f(key, v, true);
 			}
 		}
+
+		return () => keyListeners.get(key).delete(f);
 	};
 	
 	/**
