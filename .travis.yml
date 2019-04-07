@@ -1,24 +1,17 @@
 ---
 language: python
+python:
+- "3.6"
 services:
 - docker
 
 install:
-- pip install sphinx sphinx-rtd-theme
+- pip install sphinx sphinx-rtd-theme black
 
 script:
 - make -C docs html
+- black --check --diff .
 - ./build_exe.sh
-
-jobs:
-  include:
-  - stage: format-check
-    python:
-    - "3.6"
-    install:
-    - pip install black
-    script:
-    - black --check --diff .
 
 deploy:
 - provider: pypi
