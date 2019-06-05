@@ -213,6 +213,13 @@ const NetworkTables = new function () {
 	this.isWsConnected = function() {
 		return socketOpen;
 	};
+
+	// Closes socket and reopens it
+	this.closeSocket = function() {
+		if (socket) {
+			socket.close();
+		}
+	};
 	
 	/**
 		Sets the value in NetworkTables. If the websocket is not connected, the
