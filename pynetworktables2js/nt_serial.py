@@ -1,7 +1,3 @@
-# try:
-#     import ujson as json
-# except ImportError:
-#     import json
 import cbor
 
 from networktables import NetworkTables
