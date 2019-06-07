@@ -270,7 +270,7 @@ const NetworkTables = new function () {
 	
 	function createSocket() {
 		socket = new WebSocket(address);
-    socket.binaryType = "arraybuffer";
+    		socket.binaryType = "arraybuffer";
 		if (socket) {
 			
 			socket.onopen = function() {
@@ -282,7 +282,7 @@ const NetworkTables = new function () {
 			};
 			
 			socket.onmessage = function(msg) {
-				var data = CBOR.decode(msg.data);
+				const data = CBOR.decode(msg.data);
 
 				// robot connection event
 				if (data.r !== undefined) {
