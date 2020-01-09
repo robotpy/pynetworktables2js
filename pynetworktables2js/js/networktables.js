@@ -247,7 +247,7 @@ const NetworkTables = new function () {
 		
 		if (value === undefined)
 			throw new Error(key + ": 'undefined' passed to putValue");
-		
+
 		socket.send(CBOR.encode({'k': key, 'v': value}));
 		return true;
 	};
@@ -269,10 +269,10 @@ const NetworkTables = new function () {
 	const address = `${protocol}//${host}/networktables/ws`;
 	
 	function createSocket() {
+	
 		socket = new WebSocket(address);
-    		socket.binaryType = "arraybuffer";
 		if (socket) {
-			
+			socket.binaryType = "arraybuffer";
 			socket.onopen = function() {
 				console.info("Socket opened");
 				
