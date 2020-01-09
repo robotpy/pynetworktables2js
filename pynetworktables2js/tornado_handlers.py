@@ -38,7 +38,7 @@ class NetworkTablesWebSocket(WebSocketHandler):
 
     def send_msg(self, msg):
         try:
-            self.write_message(msg, False)
+            self.write_message(msg, binary=True)
         except WebSocketClosedError:
             logger.warn("websocket closed when sending message")
 
