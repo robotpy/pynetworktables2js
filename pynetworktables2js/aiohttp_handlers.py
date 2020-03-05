@@ -27,7 +27,7 @@ def networktables_websocket(request):
 
     def send_message(msg):
         # Schedule msg to be sent from the event loop's thread
-        event_loop.call_soon_threadsafe(partial(ws.send_str, msg))
+        event_loop.call_soon_threadsafe(partial(ws.send_bytes, msg))
 
     # Setup nt_serial
     nt_serial = NTSerial(send_message)
