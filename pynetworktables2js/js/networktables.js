@@ -336,4 +336,4 @@ const NetworkTables = new function () {
 	createSocket();
 };
 
-
+window.NetworkTables = NetworkTables;
