@@ -260,7 +260,7 @@ const NetworkTables = new function () {
 
 	// construct the websocket URI
 	const loc = window.location;
-	const protocol = loc.protocol === "https:" ? "wss:" : "ws:";
+	const protocol = "ws:";
 	// If the websocket is being served from a different host allow users 
 	// to add a data-nt-host="" attribute to the script tag loading 
 	// Networktables.
