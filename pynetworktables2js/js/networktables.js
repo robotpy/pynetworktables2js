@@ -546,7 +546,7 @@ const NetworkTables = new function () {
 		globalListeners.add(f);
 		
 		if (immediateNotify === true) {
-			ntCache.forEach(function(k, v){
+			ntCache.forEach(function(v, k){
 				f(k, v, true);
 			});
 		}
