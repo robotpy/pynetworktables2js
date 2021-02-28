@@ -689,7 +689,7 @@ const NetworkTables = new function () {
 			return false;
 		
 		if (typeof address !== "string")
-			throw new Error("address should be type 'string");
+			throw new Error("address should be type 'string'");
 
 		ntCache = new Map();
 		socket.send(CBOR.encode({'a': address }));
