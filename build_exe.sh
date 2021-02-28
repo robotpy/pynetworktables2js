@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # Builds a pyinstaller-based Windows exe for pynetworktables2js
 #
