@@ -679,6 +679,23 @@ const NetworkTables = new function () {
 		return true;
 	};
 
+	/**
+	 * Attempts to connect to another address.
+	 * 
+	 * :param address: The NetworkTable server address to connect to
+	 */
+	this.connect = function(address) {
+		if (!socketOpen)
+			return false;
+		
+		if (typeof address !== "string")
+			throw new Error("address should be type 'string");
+
+		ntCache = new Map();
+		socket.send(CBOR.encode({'a': address }));
+		return true;
+	}
+
 	// backwards compatibility; deprecated
 	this.setValue = this.putValue;
 	socketOpen = false;
