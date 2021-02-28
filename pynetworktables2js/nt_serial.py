@@ -44,7 +44,6 @@ class NTSerial(object):
     def _nt_connected(self, connected, info):
         self._send_update({"r": connected, "a": NetworkTables.getRemoteAddress()})
 
-
     def open(self):
         """
         Add NetworkTables listeners

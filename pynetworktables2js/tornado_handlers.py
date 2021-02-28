@@ -15,8 +15,8 @@ __all__ = ["get_handlers", "NetworkTablesWebSocket", "NonCachingStaticFileHandle
 
 class NetworkTablesWebSocket(WebSocketHandler):
     """
-        A tornado web handler that forwards values between NetworkTables
-        and a webpage via a websocket
+    A tornado web handler that forwards values between NetworkTables
+    and a webpage via a websocket
     """
 
     ntserial = None
@@ -28,7 +28,7 @@ class NetworkTablesWebSocket(WebSocketHandler):
 
     def check_origin(self, origin):
         """
-            Allow CORS requests
+        Allow CORS requests
         """
         return True
 
@@ -53,8 +53,8 @@ class NetworkTablesWebSocket(WebSocketHandler):
 
 class NonCachingStaticFileHandler(StaticFileHandler):
     """
-        This static file handler disables caching, to allow for easy
-        development of your Dashboard
+    This static file handler disables caching, to allow for easy
+    development of your Dashboard
     """
 
     # This is broken in tornado, disable it
@@ -70,22 +70,22 @@ class NonCachingStaticFileHandler(StaticFileHandler):
 
 def get_handlers():
     """
-        Returns a list that can be concatenated to the list of handlers
-        passed to the ``tornado.web.Application`` object. This list contains
-        handlers for the NetworkTables websocket and the necessary javascript
-        to use it. 
-                
-        Example usage::
-        
-            import pynetworktables2js
-            import tornado.web
-            
-            ... 
-            
-            app = tornado.web.Application(
-                pynetworktables2js.get_handlers() + [
-                    # tornado handlers here
-                ])
+    Returns a list that can be concatenated to the list of handlers
+    passed to the ``tornado.web.Application`` object. This list contains
+    handlers for the NetworkTables websocket and the necessary javascript
+    to use it.
+
+    Example usage::
+
+        import pynetworktables2js
+        import tornado.web
+
+        ...
+
+        app = tornado.web.Application(
+            pynetworktables2js.get_handlers() + [
+                # tornado handlers here
+            ])
     """
 
     js_path_opts = {"path": abspath(join(dirname(__file__), "js"))}
