@@ -16,13 +16,19 @@ class NTSerial(object):
         formatted as strings.
         """
         self.update_callback = update_callback
-        NetworkTables.addGlobalListener(self._nt_on_change, immediateNotify=True)
-        NetworkTables.addConnectionListener(self._nt_connected, immediateNotify=True)
+        self.open()
 
     def process_update(self, update):
         """Process an incoming update from a remote NetworkTables"""
         data = cbor2.loads(update)
-        NetworkTables.getEntry(data["k"]).setValue(data["v"])
+        if "a" in data:
+            self.close()
+            self._nt_connected(False, None)
+            NetworkTables.shutdown()
+            NetworkTables.initialize(data["a"])
+            self.open()
+        else:
+            NetworkTables.getEntry(data["k"]).setValue(data["v"])
 
     def _send_update(self, data):
         """Send a NetworkTables update via the stored send_update callback"""
@@ -37,6 +43,14 @@ class NTSerial(object):
     # NetworkTables connection listener callbacks
     def _nt_connected(self, connected, info):
         self._send_update({"r": connected, "a": NetworkTables.getRemoteAddress()})
+
+
+    def open(self):
+        """
+        Add NetworkTables listeners
+        """
+        NetworkTables.addGlobalListener(self._nt_on_change, immediateNotify=True)
+        NetworkTables.addConnectionListener(self._nt_connected, immediateNotify=True)
 
     def close(self):
         """
