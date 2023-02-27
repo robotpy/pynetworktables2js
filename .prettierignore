@@ -1,0 +1,10 @@
+**/*.py
+
+
+**/*.json
+
+node_modules
+
+tests
+
+docs
