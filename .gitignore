@@ -12,3 +12,5 @@ version.py
 .project
 .pydevproject
 .idea
+
+node_modules
