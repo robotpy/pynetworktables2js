@@ -1,3 +1,23 @@
+**Use Alternatives Instead**
+============================
+
+pynetworktables2js was created when web browsers could not support networktables.
+Now with networktables 4 (NT4), web browsers can directly talk to networktables servers.
+pynetworktables2js should no longer be used.
+
+Alternatives include:
+
+- `nt4.js <https://github.com/RobotCasserole1736/RobotCasserole2024/blob/main/webserver/www/interfaces/nt4.js>`__ - A pure javascript library for an NT4.1 client
+- `ntcore-ts-client <https://www.npmjs.com/package/ntcore-ts-client>`__ - A typescript library for an NT4.0 client
+- `ntcore-react <https://www.npmjs.com/package/ntcore-react>`__ - A typescript library for using networktables with React
+
+
+-----------------
+
+-----------------
+
+-----------------
+
 pynetworktables2js
 ==================
 
