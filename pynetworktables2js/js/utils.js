@@ -12,17 +12,14 @@
       -> needs a list of button ids
 */
 
-
 // requirements
 if (d3 === undefined) {
-    alert("d3.js must be downloaded+included to use utils.js!");
+  alert("d3.js must be downloaded+included to use utils.js!");
 }
 
 if ($ === undefined) {
-    alert("jQuery must be downloaded+included to use utils.js!");
+  alert("jQuery must be downloaded+included to use utils.js!");
 }
-
-
 
 /**
     Given the id of an HTML select element and the key name of a SendableChooser
@@ -38,24 +35,22 @@ if ($ === undefined) {
     in your robot's program.
 */
 function attachSelectToSendableChooser(html_id, nt_key) {
+  if (!nt_key.startsWith("/")) {
+    nt_key = "/SmartDashboard/" + nt_key;
+  }
 
-    if (!nt_key.startsWith('/')) {
-        nt_key = '/SmartDashboard/' + nt_key;
-    }
+  function update(key, value, isNew) {
+    updateSelectWithChooser(html_id, nt_key);
+  }
 
-    function update(key, value, isNew) {
-        updateSelectWithChooser(html_id, nt_key);
-    }
+  NetworkTables.addKeyListener(nt_key + "/options", update, true);
+  NetworkTables.addKeyListener(nt_key + "/default", update, true);
+  NetworkTables.addKeyListener(nt_key + "/selected", update, true);
 
-    NetworkTables.addKeyListener(nt_key + '/options', update, true);
-    NetworkTables.addKeyListener(nt_key + '/default', update, true);
-    NetworkTables.addKeyListener(nt_key + '/selected', update, true);
-    
-    $(html_id).change(function() {
-      NetworkTables.putValue(nt_key + "/selected", $(html_id).val());
-    });
+  $(html_id).change(function () {
+    NetworkTables.putValue(nt_key + "/selected", $(html_id).val());
+  });
 }
-
 
 /**
     This function is designed to be used from the onValueChanged callback
@@ -65,32 +60,27 @@ function attachSelectToSendableChooser(html_id, nt_key) {
     See attachSelectToSendableChooser documentation.
 */
 function updateSelectWithChooser(html_id, nt_key) {
+  var options = NetworkTables.getValue(nt_key + "/options");
+  if (options === undefined) return;
 
-    var options = NetworkTables.getValue(nt_key + '/options');
-    if (options === undefined)
-        return; 
+  var optDefault = NetworkTables.getValue(nt_key + "/default");
+  var selected = NetworkTables.getValue(nt_key + "/selected");
 
-    var optDefault = NetworkTables.getValue(nt_key + '/default');
-    var selected = NetworkTables.getValue(nt_key + '/selected');
+  var opt = d3.select(html_id).selectAll("option").data(options);
 
-    var opt = d3.select(html_id)
-        .selectAll("option")
-        .data(options);
+  opt.enter().append("option");
 
-    opt.enter()
-        .append("option");
+  opt.text(function (d, i) {
+    return options[i];
+  });
 
-    opt.text(function(d,i){
-        return options[i];
-    });
+  opt.exit().remove();
 
-    opt.exit().remove();
-
-    if (selected !== undefined) {
-        $(html_id).val(selected);
-    } else if (optDefault !== undefined) {
-        $(html_id).val(optDefault);
-    }
+  if (selected !== undefined) {
+    $(html_id).val(selected);
+  } else if (optDefault !== undefined) {
+    $(html_id).val(optDefault);
+  }
 }
 
 /**
@@ -102,28 +92,28 @@ function updateSelectWithChooser(html_id, nt_key) {
     :param stroke_width: Border of circle
 */
 function attachRobotConnectionIndicator(html_id, size, stroke_width) {
-    if (!size)
-        size = 20;
-        
-    size = Math.round(size/2.0)*2;
-    
-    if (!stroke_width)
-        stroke_width = Math.ceil(size/10.0);
-    
-    var r = Math.round((size - stroke_width*2)/ 2);
-    
-    var svg = d3.select(html_id).append('svg')
-                                .attr('width', size)
-                                .attr('height', size);
-    var circle = svg.append('circle')
-                    .attr('cx', r + stroke_width)
-                    .attr('cy', r + stroke_width)
-                    .attr('r', r)
-                    .style('stroke', 'black')
-                    .style('stroke-width', stroke_width);
-    
-    NetworkTables.addRobotConnectionListener(function(connected) {
-        circle.style('fill', connected ? 'lime' : 'red');
-    }, true);
-}
+  if (!size) size = 20;
 
+  size = Math.round(size / 2.0) * 2;
+
+  if (!stroke_width) stroke_width = Math.ceil(size / 10.0);
+
+  var r = Math.round((size - stroke_width * 2) / 2);
+
+  var svg = d3
+    .select(html_id)
+    .append("svg")
+    .attr("width", size)
+    .attr("height", size);
+  var circle = svg
+    .append("circle")
+    .attr("cx", r + stroke_width)
+    .attr("cy", r + stroke_width)
+    .attr("r", r)
+    .style("stroke", "black")
+    .style("stroke-width", stroke_width);
+
+  NetworkTables.addRobotConnectionListener(function (connected) {
+    circle.style("fill", connected ? "lime" : "red");
+  }, true);
+}
